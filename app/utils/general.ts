@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import EventEmitter from "eventemitter3";
 
 export function delay(ms: number) {
   return new Promise((resolve) => {
@@ -28,7 +28,7 @@ export function createEventBridge<T extends Record<string, Array<unknown>>>() {
   return {
     on<EventType extends keyof T>(
       event: EventType,
-      listener: (...args: T[EventType]) => void
+      listener: (...args: T[EventType]) => void,
     ) {
       const handler = (...args: T[EventType]) => {
         listener(...args);

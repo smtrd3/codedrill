@@ -1,6 +1,6 @@
 // import { Link } from '@tanstack/react-router'
 
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 
 export function NotFound({ children }: { children?: ReactNode }) {
   return (

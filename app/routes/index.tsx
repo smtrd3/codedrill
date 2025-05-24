@@ -1,17 +1,17 @@
-import { createFileRoute, useRouterState } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/start';
-import { Else, If, Then } from 'react-if';
+import { createFileRoute, useRouterState } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { Else, If, Then } from "react-if";
 // import { db } from '~/db/connection';
 // import { demoTable } from '~/db/schema';
-import { delay } from '~/utils/general';
+import { delay } from "~/utils/general";
 
 const getMessage = createServerFn().handler(async () => {
   // const demo = await db.select().from(demoTable);
   await delay(2000);
-  return { message: 'Hello world!' };
+  return { message: "Hello world!" };
 });
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: RouteComponent,
   loader: async () => {
     return getMessage();

@@ -1,17 +1,17 @@
-import * as React from 'react';
-import type { QueryClient } from '@tanstack/react-query';
+import * as React from "react";
+import type { QueryClient } from "@tanstack/react-query";
 import {
   Outlet,
   createRootRouteWithContext as createRootRouteFactory,
   HeadContent,
   Scripts,
-} from '@tanstack/react-router';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { TanStackRouterDevtools } from '@tanstack/router-devtools';
-import { NotFound } from '~/components/NotFound';
-import { ErrorComponent } from '~/components/ErrorComponent';
-import { SEO_LINKS, SEO_META_HEADERS } from '~/constants/seo.constants';
-import { If, Then } from 'react-if';
+} from "@tanstack/react-router";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+import { NotFound } from "~/components/NotFound";
+import { ErrorComponent } from "~/components/ErrorComponent";
+import { SEO_LINKS, SEO_META_HEADERS } from "~/constants/seo.constants";
+import { If, Then } from "react-if";
 
 export const createRoute = createRootRouteFactory<{
   queryClient: QueryClient;
@@ -45,7 +45,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body cz-shortcut-listen="true">
         {children}
-        <If condition={process.env.NODE_ENV === 'development'}>
+        <If condition={process.env.NODE_ENV === "development"}>
           <Then>
             <TanStackRouterDevtools position="bottom-right" />
             <ReactQueryDevtools buttonPosition="bottom-left" />

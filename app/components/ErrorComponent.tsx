@@ -4,10 +4,10 @@ import {
   rootRouteId,
   useMatch,
   useRouter,
-} from '@tanstack/react-router';
-import type { ErrorComponentProps } from '@tanstack/react-router';
-import { useCallback } from 'react';
-import { Else, If, Then } from 'react-if';
+} from "@tanstack/react-router";
+import type { ErrorComponentProps } from "@tanstack/react-router";
+import { useCallback } from "react";
+import { Else, If, Then } from "react-if";
 
 export function ErrorComponent({ error }: ErrorComponentProps) {
   const router = useRouter();
@@ -30,7 +30,7 @@ export function ErrorComponent({ error }: ErrorComponentProps) {
   return (
     <div className="flex flex-col justify-center items-center">
       <div className="flex">
-        <If condition={process.env.NODE_ENV === 'development'}>
+        <If condition={process.env.NODE_ENV === "development"}>
           <Then>
             <RouterErrorComponent error={error} />
           </Then>

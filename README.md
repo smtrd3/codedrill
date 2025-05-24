@@ -7,11 +7,7 @@ Starter template from divsoup.io
 ```js
 // get session interface
 const session = await useAppSession();
-
-session.id; // read session id
-
 session.data.userId; // read session data
-
 await session.clear(); // clear session
 
 // update session
@@ -26,7 +22,7 @@ await session.update((curr) => ({
 ```js
 // app/routes/api.greet.ts or app/routes/api/greet.ts
 
-import { createServerFn } from '@tanstack/start'
+import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
 const Person = z.object({
@@ -52,7 +48,7 @@ greet({
 ## Example of middleware
 
 ```js
-import { createMiddleware } from '@tanstack/start';
+import { createMiddleware } from '@tanstack/react-start';
 
 const loggingMiddleware = createMiddleware().server(async ({ next, data }) => {
   console.log('Request received:', data);
@@ -72,7 +68,7 @@ const fn = createServerFn()
 ## Client middleware
 
 ```js
-import { createMiddleware } from '@tanstack/start';
+import { createMiddleware } from '@tanstack/react-start';
 
 const loggingMiddleware = createMiddleware().client(async ({ next }) => {
   console.log('Request sent');
@@ -90,4 +86,5 @@ const isFetching = useRouterState({ select: (s) => s.isLoading });
 
 ## To create db run
 
-bunx drizzle-kit migrate
+bunx drizzle-kit generate -> generate amigration
+bunx drizzle-kit migrate -> apply a migration
