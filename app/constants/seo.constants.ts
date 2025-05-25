@@ -1,7 +1,7 @@
 import appCss from "~/styles/app.css?url";
 
 const DESCRIPTION = `Make something cool. `;
-const TITLE = "DivSoup - starter template";
+const TITLE = "Artefact.sh - starter template";
 const KEY_WORDS = "";
 
 export const SEO_META_HEADERS = [

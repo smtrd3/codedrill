@@ -1,6 +1,6 @@
 # Divsoup start
 
-Starter template from divsoup.io
+Starter template from `artefact.io`
 
 ## This is how we use session
 
@@ -13,7 +13,7 @@ await session.clear(); // clear session
 // update session
 await session.update((curr) => ({
   ...curr,
-  userId: 'UNIQUE_ID',
+  userId: "UNIQUE_ID",
 }));
 ```
 
@@ -48,12 +48,12 @@ greet({
 ## Example of middleware
 
 ```js
-import { createMiddleware } from '@tanstack/react-start';
+import { createMiddleware } from "@tanstack/react-start";
 
 const loggingMiddleware = createMiddleware().server(async ({ next, data }) => {
-  console.log('Request received:', data);
+  console.log("Request received:", data);
   const result = await next();
-  console.log('Response processed:', result);
+  console.log("Response processed:", result);
   return result;
 });
 
@@ -68,12 +68,12 @@ const fn = createServerFn()
 ## Client middleware
 
 ```js
-import { createMiddleware } from '@tanstack/react-start';
+import { createMiddleware } from "@tanstack/react-start";
 
 const loggingMiddleware = createMiddleware().client(async ({ next }) => {
-  console.log('Request sent');
+  console.log("Request sent");
   const result = await next();
-  console.log('Response received');
+  console.log("Response received");
   return result;
 });
 ```
@@ -86,5 +86,8 @@ const isFetching = useRouterState({ select: (s) => s.isLoading });
 
 ## To create db run
 
+```sh
+bunx drizzle-kit push -> quickly apply schema changes without migration file changes
 bunx drizzle-kit generate -> generate amigration
 bunx drizzle-kit migrate -> apply a migration
+```

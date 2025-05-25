@@ -21,6 +21,7 @@ export const Route = createFileRoute("/")({
 function RouteComponent() {
   const data = Route.useLoaderData();
   const routerState = useRouterState();
+
   return (
     <If condition={routerState.isLoading}>
       <Then>Loading...</Then>
