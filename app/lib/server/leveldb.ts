@@ -36,7 +36,8 @@ export class LevelDBClient {
   async put(key: string, value: any) {
     try {
       this.log(`put [${key}] -> ${value}`);
-      return this.db.put(key, value);
+      await this.db.put(key, value);
+      return value;
     } catch (ex) {
       console.error(`Failed to put ${key}`, ex);
       return false;

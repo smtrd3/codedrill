@@ -2,6 +2,8 @@ import { useSession } from "@tanstack/react-start/server";
 
 type SessionUser = {
   userId: string;
+  accessToken?: string;
+  refreshToken?: string;
 };
 
 /*

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeMuscle - Master DSA Templates Through Muscle Memory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .glow {
+            box-shadow: 0 0 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            50% {
+                opacity: 1;
+            }
+
+            51%,
+            100% {
+                opacity: 0;
+            }
+        }
+
+        .glass {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-glass {
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="text-2xl font-bold gradient-text">CodeMuscle</div>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#features"
+                        class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Features</a>
+                    <a href="#analytics"
+                        class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Analytics</a>
+                    <a href="#pricing"
+                        class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Pricing</a>
+                </div>
+                <button
+                    class="bg-purple-600 text-white px-6 py-2 rounded-full hover:bg-purple-700 transition-colors font-medium">
+                    Start Training
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white min-h-screen flex items-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-black opacity-10"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h1 class="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
+                        Stop Thinking.<br>
+                        Start <span class="typing-cursor">Typing</span>
+                    </h1>
+                    <p class="text-xl lg:text-2xl mb-8 text-gray-200 leading-relaxed">
+                        Master DSA templates through pure muscle memory. Because in interviews,
+                        <strong>speed beats brilliance</strong>.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 mb-12">
+                        <button
+                            class="bg-white text-purple-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 glow">
+                            Train Your Fingers
+                        </button>
+                        <button
+                            class="border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-purple-600 transition-all">
+                            See Templates
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-3 gap-6 text-center">
+                        <div>
+                            <div class="text-3xl font-bold">15k+</div>
+                            <div class="text-gray-300">Developers Trained</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold">50+</div>
+                            <div class="text-gray-300">DSA Templates</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold">97%</div>
+                            <div class="text-gray-300">Interview Success</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <img src="https://placehold.co/600x500/4c1d95/ffffff?text=Code+Practice+Demo"
+                        alt="Typing Practice Demo" class="rounded-2xl shadow-2xl glow">
+                    <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-lg">
+                        <div class="text-purple-600 font-bold">Live WPM: 120</div>
+                        <div class="text-gray-600 text-sm">DFS Template</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3">
+                </path>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Problem Statement -->
+    <section class="py-20 bg-gray-900 text-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl font-bold mb-12">The Uncomfortable Truth About Coding Interviews</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-red-600 p-8 rounded-2xl">
+                    <div class="text-6xl mb-4">😰</div>
+                    <h3 class="text-xl font-bold mb-4">You Panic Under Pressure</h3>
+                    <p class="text-gray-200">45 minutes to solve, explain, and code. Your brilliant algorithm means
+                        nothing if you can't type it fast enough.</p>
+                </div>
+                <div class="bg-orange-600 p-8 rounded-2xl">
+                    <div class="text-6xl mb-4">⏰</div>
+                    <h3 class="text-xl font-bold mb-4">Time is Your Enemy</h3>
+                    <p class="text-gray-200">Spending 10 minutes typing a DFS that should take 2 minutes? You've already
+                        lost the interview.</p>
+                </div>
+                <div class="bg-yellow-600 p-8 rounded-2xl">
+                    <div class="text-6xl mb-4">🤔</div>
+                    <h3 class="text-xl font-bold mb-4">Overthinking Kills Speed</h3>
+                    <p class="text-gray-200">While you're "thinking deeply" about edge cases, someone else just
+                        muscle-memorized the solution.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-6">Train Like an Athlete. Code Like a Machine.</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    We're not here to make you a better thinker. We're here to make your fingers faster than your
+                    competitors.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-16 items-center mb-16">
+                <div>
+                    <h3 class="text-3xl font-bold mb-6">50+ Battle-Tested Templates</h3>
+                    <p class="text-lg text-gray-600 mb-6">
+                        Every DSA pattern you'll ever need in interviews. DFS, BFS, Dynamic Programming,
+                        Sliding Window, Two Pointers - all optimized for speed typing.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-purple-600 rounded-full mr-4"></div>
+                            <span class="font-medium">Graph Traversal Templates</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-purple-600 rounded-full mr-4"></div>
+                            <span class="font-medium">Dynamic Programming Patterns</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-purple-600 rounded-full mr-4"></div>
+                            <span class="font-medium">Tree & Binary Search Templates</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-purple-600 rounded-full mr-4"></div>
+                            <span class="font-medium">Combinatorial Search Patterns</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <img src="https://placehold.co/500x400/8b5cf6/ffffff?text=DSA+Templates" alt="DSA Templates"
+                        class="rounded-2xl shadow-xl">
+                    <div class="absolute -top-4 -right-4 bg-green-500 text-white px-4 py-2 rounded-full font-bold">
+                        NEW: Backtracking Pack
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-16 items-center mb-16">
+                <div class="order-2 lg:order-1">
+                    <img src="https://placehold.co/500x400/6366f1/ffffff?text=Game+Modes" alt="Game Modes"
+                        class="rounded-2xl shadow-xl">
+                </div>
+                <div class="order-1 lg:order-2">
+                    <h3 class="text-3xl font-bold mb-6">Addictive Game Modes</h3>
+                    <p class="text-lg text-gray-600 mb-6">
+                        We've gamified the hell out of typing practice. Because if you're not having fun,
+                        you're not going to practice enough to dominate your interviews.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <div class="font-bold text-blue-600">Speed Demon</div>
+                            <div class="text-sm text-gray-600">Race against time</div>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <div class="font-bold text-green-600">Accuracy Master</div>
+                            <div class="text-sm text-gray-600">Perfect typing challenge</div>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <div class="font-bold text-purple-600">Template Blitz</div>
+                            <div class="text-sm text-gray-600">Random pattern practice</div>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-lg">
+                            <div class="font-bold text-red-600">Interview Sim</div>
+                            <div class="text-sm text-gray-600">Pressure mode</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h3 class="text-3xl font-bold mb-6">Your Templates, Your Rules</h3>
+                    <p class="text-lg text-gray-600 mb-6">
+                        Found a killer template online? Company has specific coding patterns? Upload any code snippet
+                        and turn it into a typing drill. Because the best templates are the ones you actually use.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span class="font-medium">Upload any code snippet in seconds</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </div>
+                            <span class="font-medium">Auto-formatting and syntax highlighting</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span class="font-medium">Track progress on custom templates</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mr-4">
+                                <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span class="font-medium">Share templates with your team</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <img src="https://placehold.co/500x400/10b981/ffffff?text=Upload+Custom+Templates"
+                        alt="Custom Templates" class="rounded-2xl shadow-xl">
+                    <div
+                        class="absolute -bottom-4 -right-4 bg-orange-500 text-white px-4 py-2 rounded-full font-bold text-sm">
+                        Drag & Drop
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analytics Section -->
+    <section id="analytics" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-6">Data-Driven Improvement</h2>
+                <p class="text-xl text-gray-600">
+                    Track every keystroke, optimize every pattern, dominate every interview.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-2xl shadow-lg">
+                    <div class="text-4xl mb-4">📊</div>
+                    <h3 class="text-xl font-bold mb-4">Speed Analytics</h3>
+                    <p class="text-gray-600 mb-6">
+                        Track your WPM for each template type. See exactly where you're slow and focus your training.
+                    </p>
+                    <img src="https://placehold.co/300x200/3b82f6/ffffff?text=Speed+Chart" alt="Speed Analytics"
+                        class="rounded-lg w-full">
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-lg">
+                    <div class="text-4xl mb-4">🎯</div>
+                    <h3 class="text-xl font-bold mb-4">Accuracy Tracking</h3>
+                    <p class="text-gray-600 mb-6">
+                        Monitor your error patterns. Identify the code constructs that trip you up most.
+                    </p>
+                    <img src="https://placehold.co/300x200/10b981/ffffff?text=Accuracy+Graph" alt="Accuracy Tracking"
+                        class="rounded-lg w-full">
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-lg">
+                    <div class="text-4xl mb-4">🔥</div>
+                    <h3 class="text-xl font-bold mb-4">Habit Formation</h3>
+                    <p class="text-gray-600 mb-6">
+                        Streak counters, daily goals, and habit tracking to keep you practicing consistently.
+                    </p>
+                    <img src="https://placehold.co/300x200/f59e0b/ffffff?text=Streak+Calendar" alt="Habit Tracking"
+                        class="rounded-lg w-full">
+                </div>
+            </div>
+
+            <div class="mt-16 bg-white p-8 rounded-2xl shadow-lg">
+                <div class="grid lg:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Template Mastery Dashboard</h3>
+                        <p class="text-gray-600 mb-6">
+                            See your progress across all DSA patterns. Know exactly which templates you've mastered
+                            and which ones need more practice before your next interview.
+                        </p>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium">DFS Traversal</span>
+                                <div class="bg-green-200 rounded-full px-3 py-1 text-green-800 text-sm font-medium">
+                                    Mastered</div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium">Binary Search</span>
+                                <div class="bg-blue-200 rounded-full px-3 py-1 text-blue-800 text-sm font-medium">
+                                    Practicing</div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium">Dynamic Programming</span>
+                                <div class="bg-red-200 rounded-full px-3 py-1 text-red-800 text-sm font-medium">Needs
+                                    Work</div>
+                            </div>
+                        </div>
+                    </div>
+                    <img src="https://placehold.co/400x300/8b5cf6/ffffff?text=Dashboard+Preview" alt="Dashboard"
+                        class="rounded-xl shadow-lg">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-20 bg-purple-900 text-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-16">What Our Users Say</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="dark-glass p-8 rounded-2xl">
+                    <div class="flex items-center mb-4">
+                        <img src="https://placehold.co/50x50/667eea/ffffff?text=A" alt="User" class="rounded-full mr-4">
+                        <div>
+                            <div class="font-bold">Alex Chen</div>
+                            <div class="text-purple-300">Software Engineer @ Google</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">
+                        "I went from taking 8 minutes to code a DFS to 90 seconds. Got offers from 4 FAANG companies.
+                        This app is borderline cheating."
+                    </p>
+                </div>
+
+                <div class="dark-glass p-8 rounded-2xl">
+                    <div class="flex items-center mb-4">
+                        <img src="https://placehold.co/50x50/764ba2/ffffff?text=S" alt="User" class="rounded-full mr-4">
+                        <div>
+                            <div class="font-bold">Sarah Kim</div>
+                            <div class="text-purple-300">Senior SDE @ Amazon</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">
+                        "My typing speed for algorithms increased 3x in just 2 weeks. Interviewers were impressed
+                        by how quickly I could implement solutions."
+                    </p>
+                </div>
+
+                <div class="dark-glass p-8 rounded-2xl">
+                    <div class="flex items-center mb-4">
+                        <img src="https://placehold.co/50x50/8b5cf6/ffffff?text=M" alt="User" class="rounded-full mr-4">
+                        <div>
+                            <div class="font-bold">Marcus Johnson</div>
+                            <div class="text-purple-300">Tech Lead @ Meta</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">
+                        "Finally, someone gets it. Interviews aren't about being smart - they're about being fast.
+                        This app made me interview-ready in record time."
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-5xl font-bold mb-6">Ready to Dominate Your Next Interview?</h2>
+            <p class="text-xl mb-8 text-purple-100">
+                Join thousands of developers who chose speed over struggle.
+                Start your 7-day free trial today.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+                <button
+                    class="bg-white text-purple-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 glow">
+                    Start Free Trial
+                </button>
+                <button
+                    class="border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-purple-600 transition-all">
+                    Watch Demo
+                </button>
+            </div>
+            <div class="text-purple-200 text-sm">
+                No credit card required • Cancel anytime • 7-day money-back guarantee
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="text-2xl font-bold gradient-text mb-4">CodeMuscle</div>
+                    <p class="text-gray-400">
+                        The fastest way to memorize DSA templates and dominate coding interviews.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Product</h4>
+                    <div class="space-y-2 text-gray-400">
+                        <div>Templates</div>
+                        <div>Game Modes</div>
+                        <div>Analytics</div>
+                        <div>Pricing</div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Resources</h4>
+                    <div class="space-y-2 text-gray-400">
+                        <div>Blog</div>
+                        <div>Guides</div>
+                        <div>Documentation</div>
+                        <div>Support</div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Company</h4>
+                    <div class="space-y-2 text-gray-400">
+                        <div>About</div>
+                        <div>Privacy</div>
+                        <div>Terms</div>
+                        <div>Contact</div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 CodeMuscle. All rights reserved. Made for developers who choose speed over struggle.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple scroll animation for navbar
+        window.addEventListener('scroll', function () {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.classList.add('bg-white', 'shadow-lg');
+                nav.classList.remove('glass');
+            } else {
+                nav.classList.remove('bg-white', 'shadow-lg');
+                nav.classList.add('glass');
+            }
+        });
+
+        // Typing effect for hero
+        const texts = ['Typing', 'Coding', 'Winning'];
+        let textIndex = 0;
+        const typingElement = document.querySelector('.typing-cursor');
+
+        setInterval(() => {
+            textIndex = (textIndex + 1) % texts.length;
+            typingElement.textContent = texts[textIndex];
+        }, 2000);
+    </script>
+</body>
+
+</html>

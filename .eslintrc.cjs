@@ -10,7 +10,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:jsx-a11y/recommended',
-    'prettier', // Must be last to override other configs
+    // 'prettier', // Must be last to override other configs
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -25,10 +25,10 @@ module.exports = {
     '@typescript-eslint',
     'react-hooks',
     'jsx-a11y',
-    'prettier',
+    // 'prettier',
   ],
   rules: {
-    'prettier/prettier': 'error',
+    // 'prettier/prettier': 'error',
     'react/react-in-jsx-scope': 'off', // Not needed in React 17+
     'react/prop-types': 'off', // TypeScript handles this
     '@typescript-eslint/explicit-function-return-type': 'off',

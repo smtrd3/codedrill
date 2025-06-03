@@ -12,6 +12,8 @@ import { NotFound } from "~/components/NotFound";
 import { ErrorComponent } from "~/components/ErrorComponent";
 import { SEO_LINKS, SEO_META_HEADERS } from "~/constants/seo.constants";
 import { If, Then } from "react-if";
+import { Theme } from "@radix-ui/themes";
+import { Toaster } from "react-hot-toast";
 
 export const createRoute = createRootRouteFactory<{
   queryClient: QueryClient;
@@ -42,16 +44,22 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en-US">
       <head>
         <HeadContent />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet"></link>
       </head>
       <body>
-        {children}
-        <If condition={process.env.NODE_ENV === "development"}>
-          <Then>
-            <TanStackRouterDevtools position="bottom-right" />
-            <ReactQueryDevtools buttonPosition="bottom-left" />
-          </Then>
-        </If>
+        <Theme hasBackground={false} appearance="dark">
+          {children}
+          <If condition={process.env.NODE_ENV === "development"}>
+            <Then>
+              <TanStackRouterDevtools position="bottom-right" />
+              <ReactQueryDevtools buttonPosition="bottom-left" />
+            </Then>
+          </If>
+        </Theme>
         <Scripts />
+        <Toaster position='bottom-right' />
       </body>
     </html>
   );

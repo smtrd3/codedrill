@@ -1,4 +1,5 @@
 /// <reference types="vinxi/types/server" />
+import "@radix-ui/themes/styles.css";
 import {
   createStartHandler,
   defaultStreamHandler,
