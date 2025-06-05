@@ -13,15 +13,15 @@ import { ActionDispatcher, State } from "~/state";
 import { If, Then } from "react-if";
 import { snackbar } from "~/utils/snackbars";
 
-type PopupProps = State['modalState'] & {
-  dispatch: ActionDispatcher,
+type PopupProps = State["modalState"] & {
+  dispatch: ActionDispatcher;
 };
 
 export function EditPopup(props: PopupProps) {
   const { open, editItem, mode, dispatch } = props;
 
-  const [title, setTitle] = useState('');
-  const [code, setCode] = useState('');
+  const [title, setTitle] = useState("");
+  const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
 
   const editItemId = useMemo(() => editItem?.id, [editItem?.id]);
@@ -69,15 +69,20 @@ export function EditPopup(props: PopupProps) {
 
         try {
           await DAO.update({ ...curr, id: editItemId, title, code: cleanCode });
-          dispatch({ type: 'update_test', payload: updated });
-          dispatch({ type: 'set_modal_state', payload: { open: false } });
+          dispatch({ type: "update_test", payload: updated });
+          dispatch({ type: "set_modal_state", payload: { open: false } });
         } catch {
           snackbar.error("Failed to update test, please try after some time");
         }
       } else {
         try {
-          const newTest = await DAO.put({ title, code, elapsed: 0, testCount: 0 });
-          dispatch({ type: 'add_test', payload: newTest });
+          const newTest = await DAO.put({
+            title,
+            code,
+            elapsed: 0,
+            testCount: 0,
+          });
+          dispatch({ type: "add_test", payload: newTest });
           dispatch({ type: "set_modal_state", payload: { open: false } });
         } catch {
           snackbar.error("Failed to create test, please try after some time");
@@ -96,7 +101,7 @@ export function EditPopup(props: PopupProps) {
 
     try {
       await DAO.delete(editItemId);
-      dispatch({ type: 'delete_test', payload: editItemId });
+      dispatch({ type: "delete_test", payload: editItemId });
       dispatch({ type: "set_modal_state", payload: { open: false } });
       snackbar.success("Test deleted successfully");
     } catch {
@@ -104,19 +109,18 @@ export function EditPopup(props: PopupProps) {
     } finally {
       setBusy(false);
     }
-
   }, [busy, editItemId, dispatch]);
 
   useEffect(() => {
-    setTitle(editItem?.title || '');
-    setCode(editItem?.code || '');
+    setTitle(editItem?.title || "");
+    setCode(editItem?.code || "");
   }, [editItem?.title, editItem?.code]);
 
   return (
     <Dialog.Root open={open}>
       <Dialog.Content maxWidth="800px" className="font-code">
         <Dialog.Title className="font-code">
-          {mode === 'edit' ? "Update code snippet" : "Add new snippet"}
+          {mode === "edit" ? "Update code snippet" : "Add new snippet"}
         </Dialog.Title>
         <Dialog.Description></Dialog.Description>
         <Flex direction="column" gap="3">
@@ -124,7 +128,7 @@ export function EditPopup(props: PopupProps) {
             <Text as="div" size="2" mb="1" weight="bold">
               Title
             </Text>
-            <Text as="p" size={'2'} mb={'2'} color="gray">
+            <Text as="p" size={"2"} mb={"2"} color="gray">
               Enter a title between 10 and 50 characters long
             </Text>
             <TextField.Root
@@ -133,15 +137,15 @@ export function EditPopup(props: PopupProps) {
               onChange={onTitleChange}
               className="font-code"
               maxLength={50}
-            >
-            </TextField.Root>
+            ></TextField.Root>
           </label>
           <label>
             <Text as="div" size="2" mb="1" weight="bold">
               Snippet
             </Text>
-            <Text as="p" size={'2'} mb={'2'} color="gray">
-              Enter a code snippet. For best typing experience do not enter text with very long lines and keep the overall line count under 30
+            <Text as="p" size={"2"} mb={"2"} color="gray">
+              Enter a code snippet. For best typing experience do not enter text
+              with very long lines and keep the overall line count under 30
             </Text>
             <TextArea
               placeholder="console.log('Hello world!')"
@@ -155,7 +159,7 @@ export function EditPopup(props: PopupProps) {
 
         <Flex mt="4" justify="between">
           <div>
-            <If condition={mode === 'edit'}>
+            <If condition={mode === "edit"}>
               <Then>
                 <Button
                   variant="soft"
@@ -172,7 +176,9 @@ export function EditPopup(props: PopupProps) {
             <Button
               variant="soft"
               color="gray"
-              onClick={() => dispatch({ type: 'set_modal_state', payload: { open: false } })}
+              onClick={() =>
+                dispatch({ type: "set_modal_state", payload: { open: false } })
+              }
               className="font-code"
             >
               Cancel

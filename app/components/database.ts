@@ -1,4 +1,4 @@
-import { castArray, join } from "lodash-es";
+import { castArray, get, join } from "lodash-es";
 import { LevelDBClient } from "~/lib/server/leveldb";
 import { nanoid } from "nanoid";
 
@@ -8,6 +8,7 @@ export type DbInterface = {
   put: (item: unknown) => void;
   update: (item: unknown) => void;
   delete: (id: string | number) => void;
+  upsert: (item: unknown) => unknown;
 };
 
 const _db: Map<string, DbInterface> = new Map();
@@ -37,7 +38,19 @@ export async function getDB(userId: string): Promise<DbInterface> {
     },
     async put(data: unknown) {
       const uid = nanoid();
-      return await client.put(_key(uid), { ...(data as Record<string, unknown>), id: uid });
+      const id = get(data, "id");
+
+      if (id) {
+        return await client.put(_key(id), {
+          ...(data as Record<string, unknown>),
+          id: id,
+        });
+      }
+
+      return await client.put(_key(uid), {
+        ...(data as Record<string, unknown>),
+        id: uid,
+      });
     },
     async update(item) {
       const { id } = item as Record<string, unknown>;
@@ -45,6 +58,14 @@ export async function getDB(userId: string): Promise<DbInterface> {
     },
     async delete(id) {
       return await client.del(_key(id));
+    },
+    async upsert(item: unknown) {
+      const id = get(item, "id");
+      if (typeof id === "string") {
+        return this.update(item);
+      } else {
+        return this.put(item);
+      }
     },
   });
 

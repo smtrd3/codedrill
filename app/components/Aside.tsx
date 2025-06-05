@@ -1,11 +1,9 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import cx from "classnames";
-import { find, get, map } from "lodash-es";
-import { useCallback, useEffect, useMemo } from "react";
-import { listen } from "./events";
+import { map } from "lodash-es";
+import { useCallback, useMemo } from "react";
 import { IconAdd, IconEdit } from "./icons";
-import { DAO } from "~/utils/dao";
 import { ActionDispatcher, TestItem } from "~/state";
 
 type AsideProps = {
@@ -13,14 +11,12 @@ type AsideProps = {
   tests: TestItem[];
   testState: string;
   sidebarOpen: boolean;
-  dispatch: ActionDispatcher,
-}
+  dispatch: ActionDispatcher;
+};
 
 export function Aside(props: AsideProps) {
   const { selectedId, tests: items, testState, sidebarOpen, dispatch } = props;
-  const allowEdit = useMemo(() => testState !== 'in-progress', [testState]);
-
-  console.log(items);
+  const allowEdit = useMemo(() => testState !== "in-progress", [testState]);
 
   const stopPropagation = useCallback(
     (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -30,17 +26,29 @@ export function Aside(props: AsideProps) {
   );
 
   const createNew = useCallback(() => {
-    dispatch({ type: 'set_modal_state', payload: { open: true, mode: 'create', editItem: undefined } });
+    dispatch({
+      type: "set_modal_state",
+      payload: { open: true, mode: "create", editItem: undefined },
+    });
   }, [dispatch]);
 
-  const editItem = useCallback((item: TestItem) => {
-    dispatch({ type: 'set_modal_state', payload: { open: true, mode: 'edit', editItem: item } });
-  }, [dispatch]);
+  const editItem = useCallback(
+    (item: TestItem) => {
+      dispatch({
+        type: "set_modal_state",
+        payload: { open: true, mode: "edit", editItem: item },
+      });
+    },
+    [dispatch],
+  );
 
-  const onSelectionChange = useCallback((e: React.MouseEvent, id: string) => {
-    dispatch({ type: 'set_sidebar_state', payload: false });
-    dispatch({ type: 'set_selected', payload: id });
-  }, [dispatch]);
+  const onSelectionChange = useCallback(
+    (e: React.MouseEvent, id: string) => {
+      dispatch({ type: "set_sidebar_state", payload: false });
+      dispatch({ type: "set_selected", payload: id });
+    },
+    [dispatch],
+  );
 
   return (
     <div
@@ -67,13 +75,13 @@ export function Aside(props: AsideProps) {
           >
             <span
               onClick={(e) => onSelectionChange(e, item.id)}
-              className={
-                cx(
-                  "whitespace-pre text-ellipsis overflow-hidden px-2",
-                  "flex-grow font-code font-bold",
-                  selectedId === item.id ? "text-fuchsia-500" : "text-white text-opacity-75 hover:text-opacity-100"
-                )
-              }
+              className={cx(
+                "whitespace-pre text-ellipsis overflow-hidden px-2",
+                "flex-grow font-code font-bold",
+                selectedId === item.id
+                  ? "text-fuchsia-500"
+                  : "text-white text-opacity-75 hover:text-opacity-100",
+              )}
             >
               {item.title}
             </span>

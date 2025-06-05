@@ -1,19 +1,19 @@
 // import * as React from "react";
-import type { QueryClient } from "@tanstack/react-query";
+import type { QueryClient } from '@tanstack/react-query';
 import {
   Outlet,
   createRootRouteWithContext as createRootRouteFactory,
   HeadContent,
   Scripts,
-} from "@tanstack/react-router";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { NotFound } from "~/components/NotFound";
-import { ErrorComponent } from "~/components/ErrorComponent";
-import { SEO_LINKS, SEO_META_HEADERS } from "~/constants/seo.constants";
-import { If, Then } from "react-if";
-import { Theme } from "@radix-ui/themes";
-import { Toaster } from "react-hot-toast";
+} from '@tanstack/react-router';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { NotFound } from '~/components/NotFound';
+import { ErrorComponent } from '~/components/ErrorComponent';
+import { SEO_LINKS, SEO_META_HEADERS } from '~/constants/seo.constants';
+import { If, Then } from 'react-if';
+import { Theme } from '@radix-ui/themes';
+import { Toaster } from 'react-hot-toast';
 
 export const createRoute = createRootRouteFactory<{
   queryClient: QueryClient;
@@ -24,14 +24,14 @@ export const Route = createRoute({
     meta: SEO_META_HEADERS,
     links: SEO_LINKS,
   }),
-  errorComponent: (props) => {
+  errorComponent: props => {
     return (
       <RootDocument>
         <ErrorComponent {...props} />
       </RootDocument>
     );
   },
-  notFoundComponent: (_d) => <NotFound />,
+  notFoundComponent: _d => <NotFound />,
   component: () => (
     <RootDocument>
       <Outlet />
@@ -45,13 +45,21 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet"></link>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossrigin />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap"
+          rel="stylesheet"
+        />
+
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body>
         <Theme hasBackground={false} appearance="dark">
           {children}
-          <If condition={process.env.NODE_ENV === "development"}>
+          <If condition={process.env.NODE_ENV === 'development'}>
             <Then>
               <TanStackRouterDevtools position="bottom-right" />
               <ReactQueryDevtools buttonPosition="bottom-left" />
@@ -59,7 +67,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           </If>
         </Theme>
         <Scripts />
-        <Toaster position='bottom-right' />
+        <Toaster position="bottom-right" />
       </body>
     </html>
   );

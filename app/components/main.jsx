@@ -13,5 +13,5 @@ createRoot(document.getElementById("root")).render(
       position="bottom-right"
       reverseOrder={false}
     />
-  </StrictMode>
+  </StrictMode>,
 );

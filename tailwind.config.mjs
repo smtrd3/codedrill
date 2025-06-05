@@ -5,8 +5,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        code: "Source Code Pro"
-      }
-    }
-  }
+        code: "Source Code Pro",
+        sans: "Inter",
+      },
+    },
+  },
 };
