@@ -1,36 +1,36 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useReducer } from "react";
-import { Aside } from "~/components/Aside";
-import { IconBack, IconSidebar } from "~/components/icons";
-import { EditPopup } from "~/components/Popup";
-import { initialState, reducer, TestItem, TestState } from "~/state";
-import { DAO } from "~/utils/dao";
-import { find, isEmpty } from "lodash-es";
-import { Badge, Button, Flex } from "@radix-ui/themes";
-import { TypingPad } from "~/components/TypingPad";
-import { StatsContent } from "~/components/StatsContent";
+import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { useCallback, useEffect, useMemo, useReducer } from 'react';
+import { Aside } from '~/components/Aside';
+import { IconBack, IconSidebar } from '~/components/icons';
+import { EditPopup } from '~/components/Popup';
+import { initialState, reducer, TestState } from '~/state';
+import { DAO } from '~/utils/dao';
+import { find, isEmpty } from 'lodash-es';
+import { Badge, Button, Flex } from '@radix-ui/themes';
+import { TypingPad } from '~/components/TypingPad';
+import { StatsContent } from '~/components/StatsContent';
 
-export const Route = createFileRoute("/app")({
+export const Route = createFileRoute('/app')({
   component: AppLayout,
   loader: async () => {
-    return DAO.getAll() as unknown as TestItem[];
+    return await DAO.getUserTemplates();
   },
   ssr: false,
 });
 
 function AppLayout() {
   const tests = Route.useLoaderData();
-  const [state, dispatch] = useReducer(reducer, initialState, (state) => ({
+  const [state, dispatch] = useReducer(reducer, initialState, state => ({
     ...state,
     tests: tests,
   }));
 
   const testsFromState = useMemo(() => state.tests, [state.tests]);
   const snippet = useMemo(
-    () => find(testsFromState, { id: state.selectedId }),
-    [testsFromState, state],
+    () => find(testsFromState, { uuid: state.selectedId }),
+    [testsFromState, state]
   );
   const selectedId = useMemo(() => state.selectedId, [state.selectedId]);
   const typingState = useMemo(() => state.testState, [state.testState]);
@@ -39,19 +39,19 @@ function AppLayout() {
     (e: React.MouseEvent<any>) => {
       e.stopPropagation();
       dispatch({
-        type: "set_sidebar_state",
+        type: 'set_sidebar_state',
         payload: state.sidebarOpen ? false : true,
       });
     },
-    [state.sidebarOpen],
+    [state.sidebarOpen]
   );
 
   const setTypingState = useCallback((testState: TestState) => {
-    dispatch({ type: "set_test_state", payload: testState });
+    dispatch({ type: 'set_test_state', payload: testState });
   }, []);
 
   const setSelectedId = useCallback((selectedId: string | null) => {
-    dispatch({ type: "set_selected", payload: selectedId });
+    dispatch({ type: 'set_selected', payload: selectedId });
   }, []);
 
   const asideProps = useMemo(() => {
@@ -67,21 +67,25 @@ function AppLayout() {
 
   useEffect(() => {
     if (!snippet) {
-      dispatch({ type: "set_test_state", payload: "initial" });
+      dispatch({ type: 'set_test_state', payload: 'initial' });
     }
   }, [snippet]);
+
+  useEffect(() => {
+    dispatch({ type: 'replace', payload: tests });
+  }, [tests]);
 
   return (
     <>
       <div
         className="w-full flex items-center flex-col text-white font-code min-h-screen"
-        onClick={(e) => {
+        onClick={e => {
           e.stopPropagation();
-          dispatch({ type: "set_sidebar_state", payload: false });
+          dispatch({ type: 'set_sidebar_state', payload: false });
         }}
       >
         {isEmpty(testsFromState) && (
-          <Flex pt={"8"}>
+          <Flex pt={'8'}>
             <Button>Create your first test</Button>
           </Flex>
         )}
@@ -91,12 +95,12 @@ function AppLayout() {
               {IconBack}
             </button>
             <span>{snippet?.title}</span>
-            {typingState === "in-progress" && (
+            {typingState === 'in-progress' && (
               <Badge color="green" className="font-bold">
                 RUNNING
               </Badge>
             )}
-            {typingState === "complete" && (
+            {typingState === 'complete' && (
               <Badge color="purple" className="font-bold">
                 COMPLETE
               </Badge>
@@ -108,7 +112,7 @@ function AppLayout() {
             <TypingPad
               tests={testsFromState}
               selectedId={selectedId}
-              code={snippet!.code}
+              code={snippet!.template}
               onStateChange={setTypingState}
               dispatch={dispatch}
             />
@@ -116,7 +120,7 @@ function AppLayout() {
         )}
         {isEmpty(snippet) && (
           <div className="w-[900px] pt-20">
-            <StatsContent />
+            <StatsContent items={testsFromState} />
           </div>
         )}
       </div>

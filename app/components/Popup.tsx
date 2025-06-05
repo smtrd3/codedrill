@@ -6,48 +6,48 @@ import {
   Text,
   TextArea,
   TextField,
-} from "@radix-ui/themes";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { DAO } from "~/utils/dao";
-import { ActionDispatcher, State } from "~/state";
-import { If, Then } from "react-if";
-import { snackbar } from "~/utils/snackbars";
+} from '@radix-ui/themes';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { DAO } from '~/utils/dao';
+import { ActionDispatcher, State } from '~/state';
+import { If, Then } from 'react-if';
+import { snackbar } from '~/utils/snackbars';
 
-type PopupProps = State["modalState"] & {
+type PopupProps = State['modalState'] & {
   dispatch: ActionDispatcher;
 };
 
 export function EditPopup(props: PopupProps) {
   const { open, editItem, mode, dispatch } = props;
 
-  const [title, setTitle] = useState("");
-  const [code, setCode] = useState("");
+  const [title, setTitle] = useState('');
+  const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
 
-  const editItemId = useMemo(() => editItem?.id, [editItem?.id]);
+  const editItemId = useMemo(() => editItem?.uuid, [editItem?.uuid]);
 
   const onTitleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setTitle(e.target.value);
     },
-    [],
+    []
   );
 
   const onCodeChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setCode(e.target.value);
     },
-    [],
+    []
   );
 
   const validate = useCallback(() => {
     if (title.length < 10) {
-      snackbar.error("Title should be at least 10 characters long");
+      snackbar.error('Title should be at least 10 characters long');
       return false;
     }
 
     if (code.length < 10) {
-      snackbar.error("Code should be at least 10 characters long");
+      snackbar.error('Code should be at least 10 characters long');
       return false;
     }
 
@@ -56,40 +56,41 @@ export function EditPopup(props: PopupProps) {
 
   const onSave = useCallback(async () => {
     if (validate()) {
-      const cleanCode = (code || "")
-        .replaceAll("\n\n", "\n")
-        .split("\n")
-        .map((line) => line.trimEnd())
-        .filter((line) => line !== "")
-        .join("\n");
+      const cleanCode = (code || '')
+        .replaceAll('\n\n', '\n')
+        .split('\n')
+        .map(line => line.trimEnd())
+        .filter(line => line !== '')
+        .join('\n');
 
       if (editItemId) {
-        const curr = await DAO.get(editItemId);
-        const updated = { ...curr, id: editItemId, title, code: cleanCode };
+        const curr = await DAO.getTemplate(editItemId);
+        const updated = { ...curr, title, template: cleanCode };
 
         try {
-          await DAO.update({ ...curr, id: editItemId, title, code: cleanCode });
-          dispatch({ type: "update_test", payload: updated });
-          dispatch({ type: "set_modal_state", payload: { open: false } });
+          await DAO.updateTemplate(
+            updated as { uuid: string; title: string; template: string }
+          );
+          dispatch({ type: 'update_test', payload: updated });
+          dispatch({ type: 'set_modal_state', payload: { open: false } });
         } catch {
-          snackbar.error("Failed to update test, please try after some time");
+          snackbar.error('Failed to update test, please try after some time');
         }
       } else {
         try {
-          const newTest = await DAO.put({
+          const newTest = await DAO.createTemplate({
             title,
-            code,
-            elapsed: 0,
-            testCount: 0,
+            template: cleanCode,
           });
-          dispatch({ type: "add_test", payload: newTest });
-          dispatch({ type: "set_modal_state", payload: { open: false } });
+
+          dispatch({ type: 'add_test', payload: newTest });
+          dispatch({ type: 'set_modal_state', payload: { open: false } });
         } catch {
-          snackbar.error("Failed to create test, please try after some time");
+          snackbar.error('Failed to create test, please try after some time');
         }
       }
       // need work
-      snackbar.success("Snippet saved!");
+      snackbar.success('Snippet saved!');
     }
   }, [editItemId, validate, code, title, dispatch]);
 
@@ -100,27 +101,27 @@ export function EditPopup(props: PopupProps) {
     setBusy(true);
 
     try {
-      await DAO.delete(editItemId);
-      dispatch({ type: "delete_test", payload: editItemId });
-      dispatch({ type: "set_modal_state", payload: { open: false } });
-      snackbar.success("Test deleted successfully");
+      await DAO.deleteTemplate(editItemId);
+      dispatch({ type: 'delete_test', payload: editItemId });
+      dispatch({ type: 'set_modal_state', payload: { open: false } });
+      snackbar.success('Test deleted successfully');
     } catch {
-      snackbar.error("Snippet deletion failed");
+      snackbar.error('Snippet deletion failed');
     } finally {
       setBusy(false);
     }
   }, [busy, editItemId, dispatch]);
 
   useEffect(() => {
-    setTitle(editItem?.title || "");
-    setCode(editItem?.code || "");
-  }, [editItem?.title, editItem?.code]);
+    setTitle(editItem?.title || '');
+    setCode(editItem?.template || '');
+  }, [editItem?.title, editItem?.template]);
 
   return (
     <Dialog.Root open={open}>
       <Dialog.Content maxWidth="800px" className="font-code">
         <Dialog.Title className="font-code">
-          {mode === "edit" ? "Update code snippet" : "Add new snippet"}
+          {mode === 'edit' ? 'Update code snippet' : 'Add new snippet'}
         </Dialog.Title>
         <Dialog.Description></Dialog.Description>
         <Flex direction="column" gap="3">
@@ -128,7 +129,7 @@ export function EditPopup(props: PopupProps) {
             <Text as="div" size="2" mb="1" weight="bold">
               Title
             </Text>
-            <Text as="p" size={"2"} mb={"2"} color="gray">
+            <Text as="p" size={'2'} mb={'2'} color="gray">
               Enter a title between 10 and 50 characters long
             </Text>
             <TextField.Root
@@ -143,7 +144,7 @@ export function EditPopup(props: PopupProps) {
             <Text as="div" size="2" mb="1" weight="bold">
               Snippet
             </Text>
-            <Text as="p" size={"2"} mb={"2"} color="gray">
+            <Text as="p" size={'2'} mb={'2'} color="gray">
               Enter a code snippet. For best typing experience do not enter text
               with very long lines and keep the overall line count under 30
             </Text>
@@ -159,7 +160,7 @@ export function EditPopup(props: PopupProps) {
 
         <Flex mt="4" justify="between">
           <div>
-            <If condition={mode === "edit"}>
+            <If condition={mode === 'edit'}>
               <Then>
                 <Button
                   variant="soft"
@@ -172,12 +173,12 @@ export function EditPopup(props: PopupProps) {
               </Then>
             </If>
           </div>
-          <Flex gap={"3"}>
+          <Flex gap={'3'}>
             <Button
               variant="soft"
               color="gray"
               onClick={() =>
-                dispatch({ type: "set_modal_state", payload: { open: false } })
+                dispatch({ type: 'set_modal_state', payload: { open: false } })
               }
               className="font-code"
             >

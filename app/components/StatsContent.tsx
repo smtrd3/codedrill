@@ -1,45 +1,13 @@
-import { DataList, Flex, Table } from "@radix-ui/themes";
-import { divide, map, size, sumBy } from "lodash-es";
-import { useCallback, useEffect, useState } from "react";
-import { listen } from "./events";
-import { DAO } from "~/utils/dao";
+import { DataList, Flex, Table } from '@radix-ui/themes';
+import { divide, map, size, sumBy } from 'lodash-es';
+import { TestItem } from '~/state';
 
 type StatsContentProps = {
-  updateKey?: string;
+  items: TestItem[];
 };
 
 export function StatsContent(props: StatsContentProps) {
-  const { updateKey = "-" } = props;
-  const [items, setItems] = useState<
-    {
-      id: string;
-      title: string;
-      code: string;
-      testCount: number;
-      elapsed: number;
-    }[]
-  >([]);
-
-  const sync = useCallback(async () => {
-    const items = await DAO.getAll();
-    setItems(items);
-  }, []);
-
-  useEffect(() => {
-    sync();
-  }, [updateKey, sync]);
-
-  useEffect(() => {
-    return listen("deleted", () => {
-      sync();
-    });
-  }, []);
-
-  useEffect(() => {
-    return listen("added", () => {
-      sync();
-    });
-  }, []);
+  const { items } = props;
 
   return (
     <Flex direction="column" gap="3">
@@ -47,14 +15,14 @@ export function StatsContent(props: StatsContentProps) {
         <DataList.Item align="center">
           <DataList.Label minWidth="88px">Total Tests</DataList.Label>
           <DataList.Value>
-            <span>{sumBy(items, "testCount")}</span>
+            <span>{sumBy(items, 'count')}</span>
           </DataList.Value>
         </DataList.Item>
         <DataList.Item align="center">
           <DataList.Label minWidth="88px">Total time spent</DataList.Label>
           <DataList.Value>
             <span>
-              {divide(divide(sumBy(items, "elapsed"), 1000), 60).toFixed(2)}{" "}
+              {divide(divide(sumBy(items, 'totalTime'), 1000), 60).toFixed(2)}{' '}
               Minutes
             </span>
           </DataList.Value>
@@ -72,14 +40,14 @@ export function StatsContent(props: StatsContentProps) {
           </Table.Header>
 
           <Table.Body>
-            {map(items, (item) => (
-              <Table.Row key={item.id}>
+            {map(items, item => (
+              <Table.Row key={item.uuid}>
                 <Table.RowHeaderCell className="max-w-[200px] text-ellipsis overflow-hidden">
                   {item.title}
                 </Table.RowHeaderCell>
-                <Table.Cell>{item.testCount}</Table.Cell>
+                <Table.Cell>{item.count}</Table.Cell>
                 <Table.Cell>
-                  {divide(divide(item.elapsed, 1000), 60).toFixed(2)}
+                  {divide(divide(item.totalTime, 1000), 60).toFixed(2)}
                 </Table.Cell>
               </Table.Row>
             ))}

@@ -1,17 +1,16 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { runCompleteAnimation } from "./confetti";
-import { Button, IconButton, Tooltip } from "@radix-ui/themes";
-import cx from "classnames";
-import { EyeClose, EyeOpen } from "./icons";
-import { ActionDispatcher, TestItem, TestState } from "~/state";
-import { If, Then } from "react-if";
-import { find, findIndex, get, sample, size, sum } from "lodash-es";
-import { DAO } from "~/utils/dao";
+/* eslint-disable react/display-name */
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { runCompleteAnimation } from './confetti';
+import { IconButton, Tooltip } from '@radix-ui/themes';
+import { ActionDispatcher, TestItem, TestState } from '~/state';
+import { find, findIndex, get, sample, size } from 'lodash-es';
+import { DAO } from '~/utils/dao';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import PowerModeInput from "power-mode-input";
-import { formatDate } from "~/utils/date";
-import { snackbar } from "~/utils/snackbars";
+import PowerModeInput from 'power-mode-input';
+import { formatDate } from '~/utils/date';
+import { snackbar } from '~/utils/snackbars';
+import { useRouter } from '@tanstack/react-router';
 
 let timerId = 0;
 
@@ -26,7 +25,7 @@ export type TypingPadProps = {
   dispatch: ActionDispatcher;
 };
 
-export function TypingPad(props: TypingPadProps) {
+export const TypingPad = memo((props: TypingPadProps) => {
   const {
     tests,
     selectedId,
@@ -37,22 +36,23 @@ export function TypingPad(props: TypingPadProps) {
     onStateChange,
     dispatch,
   } = props;
+  const router = useRouter();
   const textarea = useRef<HTMLTextAreaElement>(null);
-  const [typed, setTyped] = useState("");
+  const [typed, setTyped] = useState('');
   const [elapsed, setElapsed] = useState(0);
-  const [testState, setTestState] = useState<TestState>("initial");
+  const [testState, setTestState] = useState<TestState>('initial');
   const [continuousMode, setContinuousMode] = useState(false);
   const [randomMode, setRandomMode] = useState(false);
 
   const selectedTest = useMemo(() => {
-    return find(tests, { id: selectedId }) as TestItem;
+    return find(tests, { uuid: selectedId }) as TestItem;
   }, [tests, selectedId]);
 
   const append = useCallback(
     (content: string) => {
-      setTyped((typed) => {
+      setTyped(typed => {
         let nextLine = typed + content;
-        if (content === "  ") {
+        if (content === '  ') {
           const skipped = code.slice(nextLine.length);
           const matchedStartingWhitespace = skipped.match(/^[ ]+/);
           if (matchedStartingWhitespace) {
@@ -61,46 +61,46 @@ export function TypingPad(props: TypingPadProps) {
         }
 
         if (nextLine === code) {
-          setTestState("complete");
+          setTestState('complete');
         }
 
         return code.startsWith(nextLine) ? nextLine : typed;
       });
     },
-    [code],
+    [code]
   );
 
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (testState === "complete") {
+      if (testState === 'complete') {
         e.preventDefault();
         return;
       }
 
       // Start test on input
-      setTestState("in-progress");
+      setTestState('in-progress');
 
-      if (e.code == "Tab") {
+      if (e.code == 'Tab') {
         e.preventDefault();
-        append("  ");
-      } else if (e.code === "Backspace") {
+        append('  ');
+      } else if (e.code === 'Backspace') {
         e.preventDefault();
-        setTyped((typed) => typed.slice(0, -1));
-      } else if (e.code === "Enter") {
-        append("\n");
+        setTyped(typed => typed.slice(0, -1));
+      } else if (e.code === 'Enter') {
+        append('\n');
       } else if (e.key.length === 1) {
         append(e.key);
       } else {
         e.preventDefault();
       }
     },
-    [append, testState],
+    [append, testState]
   );
 
   const onReset = useCallback(() => {
-    setTyped("");
+    setTyped('');
     setElapsed(0);
-    setTestState("initial");
+    setTestState('initial');
 
     if (timerId) {
       clearInterval(timerId);
@@ -112,35 +112,35 @@ export function TypingPad(props: TypingPadProps) {
       let nextId: null | string | undefined = selectedId;
 
       while (nextId === selectedId) {
-        nextId = sample(tests)?.id;
+        nextId = sample(tests)?.uuid;
       }
 
       if (nextId) {
-        dispatch({ type: "set_selected", payload: nextId });
+        dispatch({ type: 'set_selected', payload: nextId });
       }
     }
   }, [tests, selectedId, dispatch]);
 
   const selectNext = useCallback(() => {
     if (size(tests) > 1) {
-      const idx = findIndex(tests, (item) => item.id === selectedId);
+      const idx = findIndex(tests, item => item.uuid === selectedId);
       const nextIdx = (idx + 1) % size(tests);
-      const nextId = tests[nextIdx].id;
+      const nextId = tests[nextIdx].uuid;
 
       if (nextId) {
-        dispatch({ type: "set_selected", payload: nextId });
+        dispatch({ type: 'set_selected', payload: nextId });
       }
     }
   }, [tests, selectedId, dispatch]);
 
   const startTest = useCallback(() => {
     return window.setInterval(() => {
-      setElapsed((curr) => curr + 500);
+      setElapsed(curr => curr + 500);
     }, 500);
   }, []);
 
   useEffect(() => {
-    if (testState === "in-progress") {
+    if (testState === 'in-progress') {
       timerId = startTest();
     }
 
@@ -153,33 +153,33 @@ export function TypingPad(props: TypingPadProps) {
 
   const updateActivity = useCallback(async () => {
     const date = formatDate();
-    const activityKey = `activity:${date}`;
+    // const activityKey = `activity:${date}`;
 
     try {
-      const existing = (await DAO.get(activityKey)) as { count: number };
-
-      if (existing) {
-        DAO.update({ ...existing, count: sum([existing.count, 1]) });
-      } else {
-        DAO.put({ id: activityKey, count: 1 });
-      }
+      // const existing = (await DAO.get(activityKey)) as { count: number };
+      // if (existing) {
+      // DAO.update({ ...existing, count: sum([existing.count, 1]) });
+      // } else {
+      // DAO.put({ id: activityKey, count: 1 });
+      // }
     } catch {
-      snackbar.error("Failed up update activity");
+      snackbar.error('Failed up update activity');
     }
   }, []);
 
   useEffect(() => {
-    if (testState === "complete") {
+    if (testState === 'complete') {
+      router.invalidate();
       onReset();
 
       if (selectedTest) {
-        const prevElapsed = get(selectedTest, "elapsed", 0);
-        const prevCount = get(selectedTest, "testCount", 0);
+        const prevElapsed = get(selectedTest, 'totalTime', 0);
+        const prevCount = get(selectedTest, 'count', 0);
 
-        DAO.update({
+        DAO.updateTemplate({
           ...selectedTest,
-          elapsed: elapsed + prevElapsed,
-          testCount: prevCount + 1,
+          totalTime: elapsed + prevElapsed,
+          count: prevCount + 1,
         });
 
         updateActivity();
@@ -192,7 +192,7 @@ export function TypingPad(props: TypingPadProps) {
           selectNext();
         }
       } else {
-        dispatch({ type: "set_selected", payload: null });
+        dispatch({ type: 'set_selected', payload: null });
         runCompleteAnimation();
       }
     }
@@ -207,6 +207,7 @@ export function TypingPad(props: TypingPadProps) {
     dispatch,
     selectNext,
     updateActivity,
+    router,
   ]);
 
   useEffect(() => {
@@ -215,7 +216,7 @@ export function TypingPad(props: TypingPadProps) {
 
   useEffect(() => {
     onReset();
-  }, [selectedId, code]);
+  }, [selectedId, code, onReset]);
 
   useEffect(() => {
     if (textarea.current) {
@@ -225,14 +226,14 @@ export function TypingPad(props: TypingPadProps) {
         radius: 3,
         circle: true,
         alpha: [1, 0.1],
-        color: "random",
+        color: 'random',
         life: 1.5,
       });
     }
   }, [selectedId]);
 
   const minutes = elapsed / 1000 / 60;
-  const cmp = minutes === 0 ? "0.00" : (typed.length / minutes).toFixed(2);
+  const cmp = minutes === 0 ? '0.00' : (typed.length / minutes).toFixed(2);
 
   return (
     <div>
@@ -249,12 +250,12 @@ export function TypingPad(props: TypingPadProps) {
         <div className="flex gap-4">
           <Tooltip
             content="Randomize"
-            style={{ fontFamily: "Cascadia Code" }}
+            style={{ fontFamily: 'Cascadia Code' }}
             delayDuration={500}
           >
             <IconButton
-              variant={randomMode ? "solid" : "soft"}
-              onClick={() => setRandomMode((curr) => !curr)}
+              variant={randomMode ? 'solid' : 'soft'}
+              onClick={() => setRandomMode(curr => !curr)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -272,12 +273,12 @@ export function TypingPad(props: TypingPadProps) {
 
           <Tooltip
             content="Back to back"
-            style={{ fontFamily: "Cascadia Code" }}
+            style={{ fontFamily: 'Cascadia Code' }}
             delayDuration={500}
           >
             <IconButton
-              variant={continuousMode ? "solid" : "soft"}
-              onClick={() => setContinuousMode((curr) => !curr)}
+              variant={continuousMode ? 'solid' : 'soft'}
+              onClick={() => setContinuousMode(curr => !curr)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -307,12 +308,12 @@ export function TypingPad(props: TypingPadProps) {
           value={typed}
           spellCheck={false}
           style={{ fontSize }}
-          onChange={(e) => e.preventDefault()}
+          onChange={e => e.preventDefault()}
           ref={textarea}
         />
         <div
           className={
-            "row-start-1 col-start-1 leading-normal overflow-hidden text-opacity-50 whitespace-pre pointer-events-none font-code text-white caret-lime-400"
+            'row-start-1 col-start-1 leading-normal overflow-hidden text-opacity-50 whitespace-pre pointer-events-none font-code text-white caret-lime-400'
           }
           style={{ fontSize }}
         >
@@ -321,4 +322,4 @@ export function TypingPad(props: TypingPadProps) {
       </div>
     </div>
   );
-}
+});

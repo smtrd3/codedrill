@@ -1,14 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import App from "~/components/App";
+import { createFileRoute } from '@tanstack/react-router';
+import Homepage from '~/components/Homepage';
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute('/')({
   component: RouteComponent,
-  ssr: false,
+  ssr: true,
 });
 
 function RouteComponent() {
-  return (
-    // replace this with Dashboard
-    <App />
-  );
+  return <Homepage />;
 }

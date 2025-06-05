@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "de1d5cfc-f4c2-4891-84bc-7d6c93fa5a1e",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "1d95ebaa-4a0e-41fb-841c-56bf14f8506c",
+  "prevId": "de1d5cfc-f4c2-4891-84bc-7d6c93fa5a1e",
   "tables": {
     "templates": {
       "name": "templates",
@@ -73,6 +73,14 @@
           "notNull": true,
           "autoincrement": false,
           "default": 0
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'{}'"
         }
       },
       "indexes": {
