@@ -1,4 +1,5 @@
 /* eslint-disable react/display-name */
+// this is the old typing pad, it's not used anymore
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { runCompleteAnimation } from './confetti';
 import { IconButton, Tooltip } from '@radix-ui/themes';
@@ -29,7 +30,7 @@ export const TypingPad = memo((props: TypingPadProps) => {
   const {
     tests,
     selectedId,
-    width = 900,
+    width = 1000,
     height = 500,
     fontSize = 18,
     code,

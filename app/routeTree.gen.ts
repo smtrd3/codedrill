@@ -11,11 +11,18 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as NewImport } from './routes/new'
 import { Route as AuthImport } from './routes/auth'
 import { Route as AppImport } from './routes/app'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const NewRoute = NewImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const AuthRoute = AuthImport.update({
   id: '/auth',
@@ -60,6 +67,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
+    '/new': {
+      id: '/new'
+      path: '/new'
+      fullPath: '/new'
+      preLoaderRoute: typeof NewImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -69,12 +83,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
+  '/new': typeof NewRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
+  '/new': typeof NewRoute
 }
 
 export interface FileRoutesById {
@@ -82,14 +98,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
+  '/new': typeof NewRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/auth'
+  fullPaths: '/' | '/app' | '/auth' | '/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app' | '/auth'
-  id: '__root__' | '/' | '/app' | '/auth'
+  to: '/' | '/app' | '/auth' | '/new'
+  id: '__root__' | '/' | '/app' | '/auth' | '/new'
   fileRoutesById: FileRoutesById
 }
 
@@ -97,12 +114,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
+  NewRoute: typeof NewRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRoute,
   AuthRoute: AuthRoute,
+  NewRoute: NewRoute,
 }
 
 export const routeTree = rootRoute
@@ -117,7 +136,8 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/app",
-        "/auth"
+        "/auth",
+        "/new"
       ]
     },
     "/": {
@@ -128,6 +148,9 @@ export const routeTree = rootRoute
     },
     "/auth": {
       "filePath": "auth.tsx"
+    },
+    "/new": {
+      "filePath": "new.tsx"
     }
   }
 }

@@ -16,3 +16,13 @@
     @apply text-gray-900 bg-gray-50 dark:bg-gray-950 dark:text-gray-200;
   }
 }
+
+
+@keyframes cursor-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-cursor-pulse {
+  animation: cursor-pulse .5s infinite;
+}
