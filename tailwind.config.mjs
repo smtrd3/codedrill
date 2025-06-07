@@ -6,7 +6,7 @@ export default {
     extend: {
       fontFamily: {
         code: "Source Code Pro",
-        sans: "Inter",
+        sans: "Ubuntu",
       },
     },
   },

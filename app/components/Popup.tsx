@@ -40,6 +40,23 @@ export function EditPopup(props: PopupProps) {
     []
   );
 
+  const onCodeKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = (e.target as HTMLTextAreaElement).selectionStart;
+        const end = (e.target as HTMLTextAreaElement).selectionEnd;
+        const value = (e.target as HTMLTextAreaElement).value;
+        (e.target as HTMLTextAreaElement).value =
+          value.slice(0, start) + '    ' + value.slice(end);
+        (e.target as HTMLTextAreaElement).selectionStart = start + 4;
+        (e.target as HTMLTextAreaElement).selectionEnd = start + 4;
+        setCode((e.target as HTMLTextAreaElement).value);
+      }
+    },
+    []
+  );
+
   const validate = useCallback(() => {
     if (title.length < 10) {
       snackbar.error('Title should be at least 10 characters long');
@@ -117,6 +134,13 @@ export function EditPopup(props: PopupProps) {
     setCode(editItem?.template || '');
   }, [editItem?.title, editItem?.template]);
 
+  useEffect(() => {
+    if (open && mode === 'create') {
+      setTitle('');
+      setCode('');
+    }
+  }, [open, mode]);
+
   return (
     <Dialog.Root open={open}>
       <Dialog.Content maxWidth="800px" className="font-code">
@@ -136,7 +160,7 @@ export function EditPopup(props: PopupProps) {
               placeholder="Enter title for new code snippet"
               value={title}
               onChange={onTitleChange}
-              className="font-code"
+              className="[&>input]:font-code [&>input]:font-bold"
               maxLength={50}
             ></TextField.Root>
           </label>
@@ -151,9 +175,10 @@ export function EditPopup(props: PopupProps) {
             <TextArea
               placeholder="console.log('Hello world!')"
               rows={24}
-              className="font-code [&>textarea]:whitespace-pre"
+              className="[&>textarea]:font-code [&>textarea]:whitespace-pre [&>textarea]:font-bold"
               value={code}
               onChange={onCodeChange}
+              onKeyDown={onCodeKeyDown}
             />
           </label>
         </Flex>

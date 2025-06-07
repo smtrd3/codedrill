@@ -9,9 +9,11 @@ import React, {
   KeyboardEvent,
   ComponentType,
 } from 'react';
-import { Timer, Zap, Repeat, Shuffle, Skull } from 'lucide-react';
+import { Timer, Zap, Repeat, Skull, Dice3, RefreshCw } from 'lucide-react';
+import { AlertDialog, Button, Flex } from '@radix-ui/themes';
 import { Character, CharacterProps } from './Character';
 import { useInterval } from './hooks/useInterval';
+import { TestState } from '~/state';
 
 export interface Particle {
   id: number;
@@ -42,10 +44,27 @@ export type TestStats = {
 interface TypingTestProps {
   text: string;
   onComplete: (stats: TestStats) => void;
+  onTestStart?: () => void;
+  onFailed?: () => void;
+  onStateChange?: (state: TestState) => void;
   width?: string;
   height?: string;
   powerMode?: boolean;
 }
+
+const failureMessages = [
+  'Are you even trying?',
+  'My grandma types faster than you.',
+  "I've seen glaciers move with more urgency.",
+  'Maybe typing is not for you.',
+  'That was... a performance.',
+  'Were you typing with your elbows?',
+  'I suggest a new hobby. Maybe knitting?',
+  "A for effort... just kidding, it's an F.",
+];
+
+const AVERAGE_WORD_LENGTH = 10;
+const MAX_TEST_TIME = 600; // 10 minutes
 
 const typingOptionsConfig: {
   option: TypingOption;
@@ -67,7 +86,7 @@ const typingOptionsConfig: {
   },
   {
     option: 'randomization',
-    Icon: Shuffle,
+    Icon: Dice3,
     tooltip: 'Enable randomization',
     ariaLabel: 'Toggle Randomization',
   },
@@ -83,21 +102,27 @@ const typingOptionsConfig: {
 export const TypingTest: React.FC<TypingTestProps> = ({
   text,
   onComplete,
+  onTestStart,
+  onFailed,
   width = '100%',
   height = 'auto',
   powerMode = true,
+  onStateChange,
 }) => {
   const [userInput, setUserInput] = useState<string>('');
   const [startTime, setStartTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [mistakes, setMistakes] = useState<number>(0);
   const [isFinished, setIsFinished] = useState<boolean>(false);
+  const [isFailed, setIsFailed] = useState<boolean>(false);
+  const [failureMessage, setFailureMessage] = useState<string>('');
   const [particles, setParticles] = useState<Particle[]>([]);
   const [enabledOptions, setEnabledOptions] = useState<Set<TypingOption>>(
     () => {
       const initialOptions = new Set<TypingOption>();
       if (powerMode) {
         initialOptions.add('power-mode');
+        initialOptions.add('back-to-back');
       }
       return initialOptions;
     }
@@ -120,10 +145,23 @@ export const TypingTest: React.FC<TypingTestProps> = ({
     focusContainer();
   }, [focusContainer]);
 
+  const failTest = useCallback(() => {
+    setIsFailed(true);
+    const randomMessage =
+      failureMessages[Math.floor(Math.random() * failureMessages.length)];
+    setFailureMessage(randomMessage);
+    onFailed?.();
+  }, [onFailed]);
+
   // Timer logic
   useInterval(() => {
-    if (startTime && !isFinished) {
-      setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+    if (startTime && !isFinished && !isFailed) {
+      const currentElapsedTime = Math.floor((Date.now() - startTime) / 1000);
+      if (currentElapsedTime >= MAX_TEST_TIME) {
+        failTest();
+      } else {
+        setElapsedTime(currentElapsedTime);
+      }
     }
   }, 1000);
 
@@ -143,7 +181,7 @@ export const TypingTest: React.FC<TypingTestProps> = ({
       });
       return updatedParticles.filter(p => p.opacity > 0);
     });
-  }, 16); // ~60fps
+  }, 8); // ~60fps
 
   // Function to create particles at the cursor's location
   const triggerParticles = useCallback(() => {
@@ -184,7 +222,7 @@ export const TypingTest: React.FC<TypingTestProps> = ({
   // Key press handler
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
-      if (isFinished) return;
+      if (isFinished || isFailed) return;
       if (
         !startTime &&
         e.key.length === 1 &&
@@ -193,6 +231,7 @@ export const TypingTest: React.FC<TypingTestProps> = ({
         !e.altKey
       ) {
         setStartTime(Date.now());
+        onTestStart?.();
       }
       if (e.key === 'Tab') {
         e.preventDefault();
@@ -206,28 +245,47 @@ export const TypingTest: React.FC<TypingTestProps> = ({
           if (enabledOptions.has('power-mode')) triggerParticles();
         } else {
           setMistakes(m => m + 1);
+          if (enabledOptions.has('instant-death')) {
+            failTest();
+            return;
+          }
         }
         setUserInput(current => current + e.key);
       }
     },
-    [isFinished, startTime, text, userInput, enabledOptions, triggerParticles]
+    [
+      isFinished,
+      isFailed,
+      startTime,
+      text,
+      userInput,
+      enabledOptions,
+      triggerParticles,
+      onTestStart,
+      failTest,
+    ]
   );
 
   const resetTest = useCallback(() => {
     setUserInput('');
     setMistakes(0);
     setIsFinished(false);
+    setIsFailed(false);
+    setFailureMessage('');
     setStartTime(null);
     setElapsedTime(0);
-    focusContainer();
-  }, [focusContainer]);
+    setTimeout(() => {
+      focusContainer();
+    }, 100);
+    onStateChange?.('reset');
+  }, [focusContainer, onStateChange]);
 
   // Completion check
   useEffect(() => {
     if (userInput.length === totalChars && !isFinished && startTime) {
       setIsFinished(true);
       const finalTime = (Date.now() - startTime) / 1000;
-      const words = totalChars / 5;
+      const words = totalChars / AVERAGE_WORD_LENGTH;
       const wpm = (words / finalTime) * 60;
       const accuracy = Math.max(
         0,
@@ -274,10 +332,10 @@ export const TypingTest: React.FC<TypingTestProps> = ({
 
   // Calculate live WPM
   const wpm = useMemo(() => {
-    if (!startTime || elapsedTime < 2) return 0;
-    const wordsTyped = userInput.length / 5;
+    if (!startTime) return 0;
+    const wordsTyped = userInput.length / AVERAGE_WORD_LENGTH;
     const minutes = elapsedTime / 60;
-    return Math.floor(wordsTyped / minutes);
+    return Math.floor(wordsTyped / (minutes === 0 ? 1 : minutes));
   }, [userInput, elapsedTime, startTime]);
 
   useEffect(() => {
@@ -304,6 +362,7 @@ export const TypingTest: React.FC<TypingTestProps> = ({
                 opacity: p.opacity,
                 transform: 'translate(-50%, -50%)',
                 transition: 'opacity 0.5s ease-out',
+                zIndex: 1000,
               }}
             />
           ))}
@@ -326,7 +385,7 @@ export const TypingTest: React.FC<TypingTestProps> = ({
           id="typing-test-container"
           tabIndex={0}
           onKeyDown={handleKeyDown}
-          className="w-full p-4 bg-slate-900 rounded-sm font-mono tracking-wider leading-relaxed outline-none focus:ring-2 focus:ring-cyan-500 select-none"
+          className="relative w-full p-4 bg-slate-900 rounded-sm font-mono tracking-wider leading-relaxed outline-none focus:ring-2 focus:ring-cyan-500 select-none"
           style={{ width, height, cursor: 'text' }}
         >
           <div className="h-full content-start font-code">{characters}</div>
@@ -356,6 +415,31 @@ export const TypingTest: React.FC<TypingTestProps> = ({
           ))}
         </div>
       </div>
+
+      <AlertDialog.Root
+        open={isFailed}
+        onOpenChange={open => !open && resetTest()}
+      >
+        <AlertDialog.Content style={{ maxWidth: 450 }} className="font-sans">
+          <AlertDialog.Title>Test Failed!</AlertDialog.Title>
+          <AlertDialog.Description size="2" className="font-sans">
+            {failureMessage}
+          </AlertDialog.Description>
+
+          <Flex gap="3" mt="4" justify="end">
+            <AlertDialog.Action>
+              <Button
+                variant="solid"
+                color="cyan"
+                onClick={resetTest}
+                className="font-sans"
+              >
+                <RefreshCw size={16} /> Restart
+              </Button>
+            </AlertDialog.Action>
+          </Flex>
+        </AlertDialog.Content>
+      </AlertDialog.Root>
     </div>
   );
 };

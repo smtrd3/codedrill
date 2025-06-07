@@ -1,6 +1,11 @@
 import { map, reject, sample, set } from 'lodash-es';
 
-export type TestState = 'initial' | 'in-progress' | 'complete';
+export type TestState =
+  | 'initial'
+  | 'in-progress'
+  | 'complete'
+  | 'failed'
+  | 'reset';
 
 export type TestItem = {
   id: number;

@@ -5,13 +5,14 @@ import { useCallback, useEffect, useMemo, useReducer } from 'react';
 import { Aside } from '~/components/Aside';
 import { IconBack, IconSidebar } from '~/components/icons';
 import { EditPopup } from '~/components/Popup';
-import { initialState, reducer, TestItem, TestState } from '~/state';
+import { initialState, reducer, TestState } from '~/state';
 import { DAO } from '~/utils/dao';
-import { find, findIndex, isEmpty, sample, size } from 'lodash-es';
-import { Badge, Button, Flex } from '@radix-ui/themes';
+import { find, findIndex, get, isEmpty, sample, size } from 'lodash-es';
+import { Badge, BadgeProps, Button, Flex } from '@radix-ui/themes';
 import { StatsContent } from '~/components/StatsContent';
 import { TestStats, TypingTest } from '~/components/TypingTest/TypingTest';
 import { runCompleteAnimation } from '~/components/confetti';
+import cx from 'classnames';
 
 export const Route = createFileRoute('/app')({
   component: AppLayout,
@@ -20,6 +21,14 @@ export const Route = createFileRoute('/app')({
   },
   ssr: false,
 });
+
+const TEST_STATE_CONFIG: Record<TestState, { color: string; label: string }> = {
+  'in-progress': { color: 'green' as const, label: 'RUNNING' },
+  complete: { color: 'purple' as const, label: 'COMPLETE' },
+  failed: { color: 'red' as const, label: 'FAILED' },
+  reset: { color: 'blue' as const, label: 'READY' },
+  initial: { color: 'gray' as const, label: 'READY' },
+};
 
 function AppLayout() {
   const tests = Route.useLoaderData();
@@ -35,6 +44,7 @@ function AppLayout() {
   );
   const selectedId = useMemo(() => state.selectedId, [state.selectedId]);
   const typingState = useMemo(() => state.testState, [state.testState]);
+  const sidebarOpen = useMemo(() => state.sidebarOpen, [state.sidebarOpen]);
 
   const toggleSidebar = useCallback(
     (e: React.MouseEvent<any>) => {
@@ -139,17 +149,19 @@ function AppLayout() {
             <button className="text-white" onClick={() => setSelectedId(null)}>
               {IconBack}
             </button>
-            <span>{snippet?.title}</span>
-            {typingState === 'in-progress' && (
-              <Badge color="green" className="font-bold">
-                RUNNING
-              </Badge>
-            )}
-            {typingState === 'complete' && (
-              <Badge color="purple" className="font-bold">
-                COMPLETE
-              </Badge>
-            )}
+            <span className="font-sans">{snippet?.title}</span>
+            {(() => {
+              const state = get(TEST_STATE_CONFIG, typingState, {
+                color: 'gray',
+                label: 'READY',
+              });
+
+              return (
+                <Badge color={state.color as BadgeProps['color']}>
+                  <span className="font-bold">{state.label}</span>
+                </Badge>
+              );
+            })()}
           </h1>
         )}
         {snippet && (
@@ -157,16 +169,11 @@ function AppLayout() {
             <TypingTest
               text={snippet!.template}
               onComplete={handleTestComplete}
+              onTestStart={() => setTypingState('in-progress')}
+              onStateChange={setTypingState}
               width="100%"
               height="auto"
             />
-            {/* <TypingPad
-              tests={testsFromState}
-              selectedId={selectedId}
-              code={snippet!.template}
-              onStateChange={setTypingState}
-              dispatch={dispatch}
-            /> */}
           </div>
         )}
         {isEmpty(snippet) && (
@@ -177,12 +184,16 @@ function AppLayout() {
       </div>
       {/* Toggle sidebar action */}
       <button
-        className="text-white fixed left-1 top-1 bg-gray-950 p-2 rounded z-50"
+        className={cx(
+          'text-white fixed left-2 top-3 bg-gray-950 p-2 rounded z-50',
+          'transition-opacity duration-200',
+          'hover:opacity-100',
+          sidebarOpen ? 'opacity-100' : 'opacity-50'
+        )}
         onClick={toggleSidebar}
       >
         {IconSidebar}
       </button>
-      {/* <Stats /> */}
       <Aside {...asideProps} dispatch={dispatch} />
       <EditPopup {...modalState} dispatch={dispatch} />
     </>

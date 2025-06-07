@@ -3,7 +3,8 @@
 import cx from 'classnames';
 import { map } from 'lodash-es';
 import { useCallback, useMemo } from 'react';
-import { IconAdd, IconEdit } from './icons';
+import { IconButton } from '@radix-ui/themes';
+import { Plus, Edit, Trash } from 'lucide-react';
 import { ActionDispatcher, TestItem } from '~/state';
 
 type AsideProps = {
@@ -42,8 +43,18 @@ export function Aside(props: AsideProps) {
     [dispatch]
   );
 
+  const deleteItem = useCallback(
+    (id: string) => {
+      // eslint-disable-next-line no-alert
+      if (window.confirm('Are you sure you want to delete this test?')) {
+        dispatch({ type: 'delete_test', payload: id });
+      }
+    },
+    [dispatch]
+  );
+
   const onSelectionChange = useCallback(
-    (e: React.MouseEvent, id: string) => {
+    (id: string) => {
       dispatch({ type: 'set_sidebar_state', payload: false });
       dispatch({ type: 'set_selected', payload: id });
     },
@@ -54,47 +65,79 @@ export function Aside(props: AsideProps) {
     <div
       id="side-bar"
       className={cx(
-        'fixed left-0 top-0 bottom-0 w-[320px] bg-gray-950 z-10 transition',
+        'fixed left-0 top-0 bottom-0 w-[360px] bg-slate-950 z-10 transition flex flex-col',
         sidebarOpen
           ? 'opacity-100 pointer-events-auto translate-x-0'
           : 'opacity-0 pointer-events-none -translate-x-5'
       )}
       onClick={stopPropagation}
     >
-      {/* Create new */}
-      <div className="flex justify-end p-1">
-        <button className="text-white p-2 rounded" onClick={createNew}>
-          {IconAdd}
-        </button>
+      {/* Header with Create new */}
+      <div className="flex justify-between items-center p-4 flex-shrink-0">
+        <h2 className="text-lg font-bold text-slate-200 font-sans pl-8">
+          Your Tests
+        </h2>
+        <IconButton
+          variant="ghost"
+          onClick={createNew}
+          style={{ cursor: 'pointer' }}
+        >
+          <Plus size={18} className="cursor-pointer" />
+        </IconButton>
       </div>
-      <div className="absolute top-12 left-0 right-0 bottom-0 overflow-x-hidden overflow-y-auto">
+      <div className="flex-grow overflow-x-hidden overflow-y-auto">
         {map(items, item => (
           <div
             key={item.uuid}
-            className="text-white p-2 cursor-pointer flex justify-between items-center"
+            onClick={() => onSelectionChange(item.uuid)}
+            className={cx(
+              'group text-white pr-4 cursor-pointer flex justify-between items-center',
+              selectedId === item.uuid ? 'font-bold' : ''
+            )}
           >
             <span
-              onClick={e => onSelectionChange(e, item.uuid)}
               className={cx(
-                'whitespace-pre text-ellipsis overflow-hidden px-2',
-                'flex-grow font-code font-bold',
+                'whitespace-pre text-ellipsis overflow-hidden py-2 pl-4',
+                'flex-grow font-sans',
                 selectedId === item.uuid
-                  ? 'text-fuchsia-500'
-                  : 'text-white text-opacity-75 hover:text-opacity-100'
+                  ? 'text-white'
+                  : 'text-white text-opacity-60 group-hover:text-opacity-100'
               )}
             >
               {item.title}
             </span>
-            <button
+            <div
               className={cx(
-                'text-white pr-1',
-                allowEdit ? '' : 'text-opacity-15'
+                'flex items-center gap-4 transition-opacity',
+                selectedId === item.uuid
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover:opacity-100'
               )}
-              onClick={() => editItem(item)}
-              disabled={!allowEdit}
             >
-              {IconEdit}
-            </button>
+              <IconButton
+                variant="ghost"
+                onClick={e => {
+                  e.stopPropagation();
+                  editItem(item);
+                }}
+                disabled={!allowEdit}
+                style={{ cursor: 'pointer' }}
+              >
+                <Edit size={16} color="white" />
+              </IconButton>
+              <IconButton
+                variant="ghost"
+                color="red"
+                onClick={e => {
+                  e.stopPropagation();
+                  deleteItem(item.uuid);
+                }}
+                disabled={!allowEdit}
+                style={{ cursor: 'pointer' }}
+              >
+                <Trash size={16} color="white" />
+              </IconButton>
+            </div>
           </div>
         ))}
       </div>
