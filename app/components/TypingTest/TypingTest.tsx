@@ -50,6 +50,8 @@ interface TypingTestProps {
   width?: string;
   height?: string;
   powerMode?: boolean;
+  showOptions?: boolean;
+  disableFocus?: boolean;
 }
 
 const failureMessages = [
@@ -108,6 +110,8 @@ export const TypingTest: React.FC<TypingTestProps> = ({
   height = 'auto',
   powerMode = true,
   onStateChange,
+  showOptions = true,
+  disableFocus = false,
 }) => {
   const [userInput, setUserInput] = useState<string>('');
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -133,17 +137,16 @@ export const TypingTest: React.FC<TypingTestProps> = ({
   const totalChars = text.length;
 
   const focusContainer = useCallback(() => {
-    // The main div doesn't receive focus, the inner one does.
-    // So we request focus on the interactive div.
+    if (disableFocus) return;
     containerRef.current
       ?.querySelector<HTMLDivElement>('#typing-test-container')
       ?.focus();
-  }, []);
+  }, [disableFocus]);
 
   // Focus the container on mount to capture key presses
   useEffect(() => {
     focusContainer();
-  }, [focusContainer]);
+  }, [focusContainer, disableFocus]);
 
   const failTest = useCallback(() => {
     setIsFailed(true);
@@ -232,6 +235,9 @@ export const TypingTest: React.FC<TypingTestProps> = ({
       ) {
         setStartTime(Date.now());
         onTestStart?.();
+      }
+      if (e.key === ' ') {
+        e.preventDefault();
       }
       if (e.key === 'Tab') {
         e.preventDefault();
@@ -390,30 +396,32 @@ export const TypingTest: React.FC<TypingTestProps> = ({
         >
           <div className="h-full content-start font-code">{characters}</div>
         </div>
-        <div className="mt-8 flex w-full justify-center gap-2">
-          {typingOptionsConfig.map(({ option, Icon, tooltip, ariaLabel }) => (
-            <div
-              key={option}
-              className="relative group flex flex-col items-center"
-            >
-              <button
-                type="button"
-                onClick={() => handleOptionToggle(option)}
-                className={`p-2 rounded-md transition-colors duration-200 ${
-                  enabledOptions.has(option)
-                    ? 'bg-slate-900 text-cyan-400'
-                    : 'text-slate-500 hover:bg-slate-900 hover:text-slate-300'
-                }`}
-                aria-label={ariaLabel}
+        {showOptions && (
+          <div className="mt-8 flex w-full justify-center gap-2">
+            {typingOptionsConfig.map(({ option, Icon, tooltip, ariaLabel }) => (
+              <div
+                key={option}
+                className="relative group flex flex-col items-center"
               >
-                <Icon size={18} />
-              </button>
-              <div className="pointer-events-none absolute top-full mt-2 w-max rounded-md bg-slate-800 px-2 py-1 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 font-code">
-                {tooltip}
+                <button
+                  type="button"
+                  onClick={() => handleOptionToggle(option)}
+                  className={`p-2 rounded-md transition-colors duration-200 ${
+                    enabledOptions.has(option)
+                      ? 'bg-slate-900 text-cyan-400'
+                      : 'text-slate-500 hover:bg-slate-900 hover:text-slate-300'
+                  }`}
+                  aria-label={ariaLabel}
+                >
+                  <Icon size={18} />
+                </button>
+                <div className="pointer-events-none absolute top-full mt-2 w-max rounded-md bg-slate-800 px-2 py-1 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 font-code">
+                  {tooltip}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <AlertDialog.Root

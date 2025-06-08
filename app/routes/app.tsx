@@ -13,11 +13,22 @@ import { StatsContent } from '~/components/StatsContent';
 import { TestStats, TypingTest } from '~/components/TypingTest/TypingTest';
 import { runCompleteAnimation } from '~/components/confetti';
 import cx from 'classnames';
+import { getUser, goto } from '~/utils/server';
+import { createServerFn } from '@tanstack/react-start';
+
+export const fetchTemplates = createServerFn().handler(async () => {
+  const user = await getUser();
+
+  if (!user) {
+    goto('/auth', 302);
+  }
+  return await DAO.getUserTemplates();
+});
 
 export const Route = createFileRoute('/app')({
   component: AppLayout,
   loader: async () => {
-    return await DAO.getUserTemplates();
+    return await fetchTemplates();
   },
   ssr: false,
 });
@@ -178,7 +189,16 @@ function AppLayout() {
         )}
         {isEmpty(snippet) && (
           <div className="w-[900px] pt-20">
-            <StatsContent items={testsFromState} />
+            <StatsContent
+              items={testsFromState}
+              onStartTest={onRandomize}
+              onCreateTest={() => {
+                dispatch({
+                  type: 'set_modal_state',
+                  payload: { open: true, mode: 'create', editItem: undefined },
+                });
+              }}
+            />
           </div>
         )}
       </div>

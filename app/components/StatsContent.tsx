@@ -1,13 +1,17 @@
-import { Flex, Heading, Table, Tooltip } from '@radix-ui/themes';
+import { Button, Flex, Heading, Table, Tooltip } from '@radix-ui/themes';
 import { TestItem } from '~/state';
 import { format } from 'date-fns';
 import { divide, map, size, sortBy, sumBy } from 'lodash-es';
 import ActivityCalendar, { Activity } from 'react-activity-calendar';
-import { useMemo } from 'react';
-import { ListChecks, Timer, Zap } from 'lucide-react';
+import { useCallback, useMemo } from 'react';
+import { ListChecks, Timer, Zap, Play, Plus, LogOut } from 'lucide-react';
+import { authClient } from '~/lib/client/auth-client';
+import { useNavigate } from '@tanstack/react-router';
 
 type StatsContentProps = {
   items: TestItem[];
+  onStartTest: () => void;
+  onCreateTest: () => void;
 };
 
 interface StatCardProps {
@@ -55,13 +59,49 @@ function generateRandomData(count: number): Activity[] {
 }
 
 export function StatsContent(props: StatsContentProps) {
-  const { items } = props;
+  const { items, onStartTest, onCreateTest } = props;
   const sortedItems = sortBy(items, 'count').reverse();
-
+  const navigate = useNavigate();
   const activityData = useMemo(() => generateRandomData(200), []);
+
+  const signOut = useCallback(async () => {
+    await authClient.signOut();
+    navigate({ to: '/auth' });
+  }, [navigate]);
 
   return (
     <Flex direction="column" gap={'6'} className="w-full">
+      <div className="flex justify-end p-4">
+        <Button variant="soft" onClick={signOut}>
+          <LogOut size={16} />
+          Sign Out
+        </Button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <button
+          type="button"
+          className="group relative inline-flex items-center justify-center overflow-hidden rounded-2xl bg-slate-800 p-10 font-bold text-white transition-transform duration-300 hover:scale-105"
+          onClick={onStartTest}
+        >
+          <div className="absolute inset-0 z-10 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+          <div className="relative z-20 flex flex-col items-center">
+            <Play size={48} className="mb-4" />
+            <span className="text-3xl font-sans">Start Test</span>
+          </div>
+        </button>
+        <button
+          type="button"
+          className="group relative inline-flex items-center justify-center overflow-hidden rounded-2xl bg-slate-800 p-10 font-bold text-white transition-transform duration-300 hover:scale-105"
+          onClick={onCreateTest}
+        >
+          <div className="absolute inset-0 z-10 bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+          <div className="relative z-20 flex flex-col items-center">
+            <Plus size={48} className="mb-4" />
+            <span className="text-3xl font-sans">Create Test</span>
+          </div>
+        </button>
+      </div>
+
       <Flex direction="column" gap="4">
         <Heading
           as="h2"
