@@ -13,11 +13,11 @@ import { StatsContent } from '~/components/StatsContent';
 import { TestStats, TypingTest } from '~/components/TypingTest/TypingTest';
 import { runCompleteAnimation } from '~/components/confetti';
 import cx from 'classnames';
-import { getUser, goto } from '~/utils/server';
+import { getAuthState, goto } from '~/utils/server';
 import { createServerFn } from '@tanstack/react-start';
 
 export const fetchTemplates = createServerFn().handler(async () => {
-  const user = await getUser();
+  const user = await getAuthState();
 
   if (!user) {
     goto('/auth', 302);
@@ -56,6 +56,7 @@ function AppLayout() {
   const selectedId = useMemo(() => state.selectedId, [state.selectedId]);
   const typingState = useMemo(() => state.testState, [state.testState]);
   const sidebarOpen = useMemo(() => state.sidebarOpen, [state.sidebarOpen]);
+  const noTests = useMemo(() => isEmpty(testsFromState), [testsFromState]);
 
   const toggleSidebar = useCallback(
     (e: React.MouseEvent<any>) => {
@@ -87,8 +88,10 @@ function AppLayout() {
       if (nextId) {
         dispatch({ type: 'set_selected', payload: nextId });
       }
+    } else if (size(tests) === 1) {
+      setSelectedId(tests[0].uuid);
     }
-  }, [tests, selectedId, dispatch]);
+  }, [tests, selectedId, dispatch, setSelectedId]);
 
   const asideProps = useMemo(() => {
     return {
@@ -137,6 +140,13 @@ function AppLayout() {
         runCompleteAnimation();
         setSelectedId(null);
       }
+
+      DAO.updateStats({
+        time: stats.time,
+        mistakes: stats.mistakes,
+        wpm: stats.wpm,
+        accuracy: stats.accuracy,
+      });
     },
     [onRandomize, setSelectedId, setTypingState, selectNext]
   );
@@ -150,11 +160,6 @@ function AppLayout() {
           dispatch({ type: 'set_sidebar_state', payload: false });
         }}
       >
-        {isEmpty(testsFromState) && (
-          <Flex pt={'8'}>
-            <Button>Create your first test</Button>
-          </Flex>
-        )}
         {snippet && (
           <h1 className="flex items-center mt-4 w-[800px] text-2xl gap-4">
             <button className="text-white" onClick={() => setSelectedId(null)}>

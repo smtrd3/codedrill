@@ -15,6 +15,13 @@
       "when": 1749142443746,
       "tag": "0001_needy_vindicator",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1749405375918,
+      "tag": "0002_steep_ultimo",
+      "breakpoints": true
     }
   ]
 }

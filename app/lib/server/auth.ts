@@ -7,11 +7,12 @@ import { renderToString } from 'react-dom/server';
 import { createElement } from 'react';
 import { EmailVerificationTemplate } from '~/templates/verify-email';
 import { user, session, account, verification } from '~/db/auth-schema';
+import { activity } from '~/db/schema';
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'sqlite',
-    schema: { user, session, account, verification },
+    schema: { user, session, account, verification, activity },
     debugLogs: true,
   }),
   socialProviders: {

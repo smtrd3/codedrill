@@ -4,9 +4,10 @@ import { unset } from 'lodash-es';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 import { db } from '~/db/connection';
-import { templates } from '~/db/schema';
+import { activity, templates } from '~/db/schema';
+import { getUserId } from './server';
 
-export const createTemplate = createServerFn()
+const createTemplate = createServerFn()
   .validator((input: any) => {
     const schema = z.object({
       title: z.string().max(255),
@@ -16,10 +17,14 @@ export const createTemplate = createServerFn()
     return schema.parse(input);
   })
   .handler(async ctx => {
-    // TODO: add real user id
+    const userId = await getUserId();
+    if (!userId) {
+      throw new Error('User not found');
+    }
+
     const result = await db
       .insert(templates)
-      .values({ ...ctx.data, uuid: nanoid(), userId: 'demo_user' });
+      .values({ ...ctx.data, uuid: nanoid(), userId });
 
     if (result.lastInsertRowid) {
       const results = await db
@@ -33,12 +38,14 @@ export const createTemplate = createServerFn()
     }
   });
 
-export const getUserTemplates = createServerFn({ method: 'GET' }).handler(
-  async () => {
-    const userId = 'demo_user';
-    return db.select().from(templates).where(eq(templates.userId, userId));
+const getUserTemplates = createServerFn({ method: 'GET' }).handler(async () => {
+  const userId = await getUserId();
+  if (!userId) {
+    throw new Error('User not found');
   }
-);
+
+  return db.select().from(templates).where(eq(templates.userId, userId));
+});
 
 export const getTemplate = createServerFn()
   .validator((input: { id: string }) => input)
@@ -53,7 +60,7 @@ export const getTemplate = createServerFn()
     return rows.at(0);
   });
 
-export const updateTemplate = createServerFn()
+const updateTemplate = createServerFn()
   .validator((input: any) => {
     const schema = z.object({
       id: z.number().optional(),
@@ -67,7 +74,11 @@ export const updateTemplate = createServerFn()
     return schema.parse(input);
   })
   .handler(async ctx => {
-    const userId = 'demo_user';
+    const userId = await getUserId();
+    if (!userId) {
+      throw new Error('User not found');
+    }
+
     const queryId = ctx.data.uuid;
     unset(ctx.data, 'id'); // remove id from the data as it violates the unique constraint
     unset(ctx.data, 'uuid'); // remove uuid from the data as it violates the unique constraint
@@ -82,10 +93,14 @@ export const updateTemplate = createServerFn()
     return ctx.data;
   });
 
-export const deleteItem = createServerFn()
+const deleteItem = createServerFn()
   .validator((input: { id: string | number }) => input)
   .handler(async ctx => {
-    const userId = 'demo_user';
+    const userId = await getUserId();
+    if (!userId) {
+      throw new Error('User not found');
+    }
+
     await db
       .delete(templates)
       .where(
@@ -97,10 +112,65 @@ export const deleteItem = createServerFn()
     return { success: true, deletedId: ctx.data.id };
   });
 
-export const upsert = createServerFn()
-  .validator((input: any) => input)
+const updateStats = createServerFn()
+  .validator((input: any) => {
+    const schema = z.object({
+      time: z.number(),
+      mistakes: z.number(),
+      wpm: z.number(),
+      accuracy: z.number(),
+    });
+
+    return schema.parse(input);
+  })
   .handler(async ctx => {
-    return { success: true, upsertedId: ctx.data.id };
+    const userId = await getUserId();
+    if (!userId) {
+      throw new Error('User not found');
+    }
+
+    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    const statsData = ctx.data;
+
+    const existingActivity = await db
+      .select()
+      .from(activity)
+      .where(and(eq(activity.userId, userId), eq(activity.date, today)))
+      .limit(1);
+
+    if (existingActivity.length > 0) {
+      const current = existingActivity[0];
+      const newBestTime =
+        statsData.time > 0 &&
+        (current.bestTime === 0 || statsData.time < current.bestTime)
+          ? Math.trunc(statsData.time)
+          : current.bestTime;
+
+      const result = await db
+        .update(activity)
+        .set({
+          count: current.count + 1,
+          bestAccuracy: Math.max(current.bestAccuracy, statsData.accuracy),
+          bestWpm: Math.max(current.bestWpm, Math.trunc(statsData.wpm)),
+          bestTime: newBestTime,
+        })
+        .where(and(eq(activity.userId, userId), eq(activity.date, today)))
+        .returning();
+      return result.at(0);
+    } else {
+      const result = await db
+        .insert(activity)
+        .values({
+          userId,
+          date: today,
+          count: 1,
+          bestAccuracy: statsData.accuracy,
+          bestWpm: Math.trunc(statsData.wpm),
+          bestTime: Math.trunc(statsData.time),
+        })
+        .returning();
+      return result.at(0);
+    }
   });
 
 export const DAO = {
@@ -124,5 +194,13 @@ export const DAO = {
   },
   createTemplate(item: { title: string; template: string }) {
     return createTemplate({ data: item });
+  },
+  updateStats(stats: {
+    time: number;
+    mistakes: number;
+    wpm: number;
+    accuracy: number;
+  }) {
+    return updateStats({ data: stats });
   },
 };

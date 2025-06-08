@@ -4,11 +4,11 @@ import { AuthComponent, SocialProvider } from '../components/AuthComponent';
 import { authClient } from '~/lib/client/auth-client';
 import { snackbar } from '~/utils/snackbars';
 import { createServerFn } from '@tanstack/react-start';
-import { getUser, goto } from '~/utils/server';
+import { getAuthState, goto } from '~/utils/server';
 import { ArrowLeft } from 'lucide-react';
 
 export const withAuth = createServerFn().handler(async () => {
-  const user = await getUser();
+  const user = await getAuthState();
   if (user) {
     goto('/app', 302);
   }

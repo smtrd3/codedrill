@@ -1,12 +1,13 @@
 import { Button, Flex, Heading, Table, Tooltip } from '@radix-ui/themes';
 import { TestItem } from '~/state';
 import { format } from 'date-fns';
-import { divide, map, size, sortBy, sumBy } from 'lodash-es';
+import { divide, isEmpty, map, size, sortBy, sumBy } from 'lodash-es';
 import ActivityCalendar, { Activity } from 'react-activity-calendar';
 import { useCallback, useMemo } from 'react';
 import { ListChecks, Timer, Zap, Play, Plus, LogOut } from 'lucide-react';
 import { authClient } from '~/lib/client/auth-client';
 import { useNavigate } from '@tanstack/react-router';
+import { If, Then } from 'react-if';
 
 type StatsContentProps = {
   items: TestItem[];
@@ -63,10 +64,11 @@ export function StatsContent(props: StatsContentProps) {
   const sortedItems = sortBy(items, 'count').reverse();
   const navigate = useNavigate();
   const activityData = useMemo(() => generateRandomData(200), []);
+  const noTests = useMemo(() => isEmpty(items), [items]);
 
   const signOut = useCallback(async () => {
     await authClient.signOut();
-    navigate({ to: '/auth' });
+    navigate({ to: '/' });
   }, [navigate]);
 
   return (
@@ -77,7 +79,9 @@ export function StatsContent(props: StatsContentProps) {
           Sign Out
         </Button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div
+        className={`grid grid-cols-1 ${!noTests ? 'md:grid-cols-2' : ''} gap-6`}
+      >
         <button
           type="button"
           className="group relative inline-flex items-center justify-center overflow-hidden rounded-2xl bg-slate-800 p-10 font-bold text-white transition-transform duration-300 hover:scale-105"

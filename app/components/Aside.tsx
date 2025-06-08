@@ -65,7 +65,7 @@ export function Aside(props: AsideProps) {
     <div
       id="side-bar"
       className={cx(
-        'fixed left-0 top-0 bottom-0 w-[360px] bg-slate-950 z-10 transition flex flex-col',
+        'fixed left-0 top-0 bottom-0 w-[360px] bg-slate-950 z-10 transition flex flex-col z-50',
         sidebarOpen
           ? 'opacity-100 pointer-events-auto translate-x-0'
           : 'opacity-0 pointer-events-none -translate-x-5'

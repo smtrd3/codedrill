@@ -11,7 +11,7 @@ export function gotoExternal(to: string) {
   throw redirect({ href: to });
 }
 
-export async function getUser() {
+export async function getAuthState() {
   const request = getWebRequest();
 
   if (!request) {
@@ -23,6 +23,21 @@ export async function getUser() {
   });
 
   return user;
+}
+
+export async function getUser() {
+  const user = await getAuthState();
+  return user?.user;
+}
+
+export async function getSession() {
+  const user = await getAuthState();
+  return user?.session;
+}
+
+export async function getUserId() {
+  const user = await getAuthState();
+  return user?.user?.id;
 }
 
 export async function sendEmail(
