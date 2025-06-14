@@ -11,16 +11,16 @@ session.data.userId; // read session data
 await session.clear(); // clear session
 
 // update session
-await session.update((curr) => ({
+await session.update(curr => ({
   ...curr,
-  userId: "UNIQUE_ID",
+  userId: 'UNIQUE_ID',
 }));
 ```
 
 ## Example of api route with validation
 
 ```js
-// app/routes/api.greet.ts or app/routes/api/greet.ts
+// src/routes/api.greet.ts or src/routes/api/greet.ts
 
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
@@ -48,12 +48,12 @@ greet({
 ## Example of middleware
 
 ```js
-import { createMiddleware } from "@tanstack/react-start";
+import { createMiddleware } from '@tanstack/react-start';
 
 const loggingMiddleware = createMiddleware().server(async ({ next, data }) => {
-  console.log("Request received:", data);
+  console.log('Request received:', data);
   const result = await next();
-  console.log("Response processed:", result);
+  console.log('Response processed:', result);
   return result;
 });
 
@@ -68,12 +68,12 @@ const fn = createServerFn()
 ## Client middleware
 
 ```js
-import { createMiddleware } from "@tanstack/react-start";
+import { createMiddleware } from '@tanstack/react-start';
 
 const loggingMiddleware = createMiddleware().client(async ({ next }) => {
-  console.log("Request sent");
+  console.log('Request sent');
   const result = await next();
-  console.log("Response received");
+  console.log('Response received');
   return result;
 });
 ```
@@ -81,7 +81,7 @@ const loggingMiddleware = createMiddleware().client(async ({ next }) => {
 ## Show loader when router is fetching data
 
 ```js
-const isFetching = useRouterState({ select: (s) => s.isLoading });
+const isFetching = useRouterState({ select: s => s.isLoading });
 ```
 
 ## To create db run

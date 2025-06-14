@@ -1,0 +1,219 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { Aside } from '~/components/Aside';
+import { IconSidebar } from '~/components/icons';
+import { EditPopup } from '~/components/Popup';
+import { initialState, reducer, TestState } from '~/state';
+import { DAO } from '~/utils/dao';
+import { find, findIndex, sample, size } from 'lodash-es';
+import { StatsContent } from '~/components/StatsContent';
+import { TestStats, TypingTest } from '~/components/TypingTest/TypingTest';
+import { runCompleteAnimation } from '~/components/confetti';
+import cx from 'classnames';
+import { handleAuthRedirect } from '~/utils/server';
+import { X } from 'lucide-react';
+
+export const Route = createFileRoute('/app')({
+  component: AppLayout,
+  loader: async () => {
+    return await DAO.getUserTemplates();
+  },
+  beforeLoad: async () => {
+    await handleAuthRedirect();
+  },
+  ssr: false,
+});
+
+function AppLayout() {
+  const router = useRouter();
+  const tests = Route.useLoaderData();
+  const [state, dispatch] = useReducer(reducer, initialState, state => ({
+    ...state,
+    tests: tests,
+  }));
+  const [resetId, setResetId] = useState(0);
+  const testsFromState = useMemo(() => state.tests, [state.tests]);
+  const selectedId = useMemo(() => state.selectedId, [state.selectedId]);
+  const typingState = useMemo(() => state.testState, [state.testState]);
+  const sidebarOpen = useMemo(() => state.sidebarOpen, [state.sidebarOpen]);
+  const snippet = useMemo(
+    () => find(testsFromState, { uuid: selectedId }),
+    [testsFromState, selectedId]
+  );
+
+  const toggleSidebar = useCallback(
+    (e: React.MouseEvent<any>) => {
+      e.stopPropagation();
+      dispatch({
+        type: 'set_sidebar_state',
+        payload: state.sidebarOpen ? false : true,
+      });
+    },
+    [state.sidebarOpen]
+  );
+
+  const setTypingState = useCallback((testState: TestState) => {
+    dispatch({ type: 'set_test_state', payload: testState });
+  }, []);
+
+  const setSelectedId = useCallback((selectedId: string | null) => {
+    dispatch({ type: 'set_selected', payload: selectedId });
+  }, []);
+
+  const onRandomize = useCallback(() => {
+    if (size(testsFromState) > 1) {
+      let nextId: null | string | undefined = selectedId;
+
+      while (nextId === selectedId) {
+        nextId = sample(testsFromState)?.uuid;
+      }
+
+      if (nextId) {
+        dispatch({ type: 'set_selected', payload: nextId });
+      }
+    } else if (size(testsFromState) === 1) {
+      setSelectedId(testsFromState[0].uuid);
+    }
+  }, [testsFromState, selectedId, dispatch, setSelectedId]);
+
+  const asideProps = useMemo(() => {
+    return {
+      tests: state.tests,
+      sidebarOpen: state.sidebarOpen,
+      testState: state.testState,
+      selectedId: state.selectedId,
+    };
+  }, [state.tests, state.sidebarOpen, state.testState, state.selectedId]);
+
+  const modalState = useMemo(() => state.modalState, [state.modalState]);
+
+  useEffect(() => {
+    if (!snippet) {
+      dispatch({ type: 'set_test_state', payload: 'initial' });
+    }
+  }, [snippet]);
+
+  useEffect(() => {
+    dispatch({ type: 'replace', payload: tests });
+  }, [tests]);
+
+  const selectNext = useCallback(() => {
+    if (size(testsFromState) > 1) {
+      const idx = findIndex(testsFromState, item => item.uuid === selectedId);
+      const nextIdx = (idx + 1) % size(testsFromState);
+      const nextId = testsFromState[nextIdx].uuid;
+
+      if (nextId) {
+        dispatch({ type: 'set_selected', payload: nextId });
+      }
+    } else {
+      setResetId(prev => prev + 1);
+    }
+  }, [testsFromState, selectedId, dispatch]);
+
+  const handleTestComplete = useCallback(
+    async (stats: TestStats) => {
+      const testId = snippet?.uuid;
+
+      setTypingState('complete');
+
+      if (stats.typingOptions.has('back-to-back')) {
+        if (stats.typingOptions.has('randomization')) {
+          onRandomize();
+        } else {
+          selectNext();
+        }
+      } else {
+        runCompleteAnimation();
+        setSelectedId(null);
+      }
+
+      await DAO.updateStats({
+        uuid: testId!,
+        time: stats.time,
+        mistakes: stats.mistakes,
+        wpm: stats.wpm,
+        accuracy: stats.accuracy,
+      });
+
+      router.invalidate();
+    },
+    [onRandomize, setSelectedId, setTypingState, selectNext, snippet, router]
+  );
+
+  return (
+    <>
+      <div
+        className="w-full flex items-center flex-col text-white font-code min-h-screen"
+        onClick={e => {
+          e.stopPropagation();
+          dispatch({ type: 'set_sidebar_state', payload: false });
+        }}
+      >
+        <div className="w-[900px] pt-20">
+          <StatsContent
+            items={testsFromState}
+            onStartTest={onRandomize}
+            onCreateTest={() => {
+              dispatch({
+                type: 'set_modal_state',
+                payload: { open: true, mode: 'create', editItem: undefined },
+              });
+            }}
+          />
+        </div>
+        {snippet && (
+          <div className="fixed top-0 left-0 w-full h-full backdrop-blur-[100px] bg-black/40 z-50 flex flex-col items-center">
+            <div className="flex min-w-[900px] w-10/12 py-4">
+              <h1 className="flex align-center text-2xl gap-4">
+                <span className="font-sans">{snippet?.title}</span>
+              </h1>
+            </div>
+            <div className="flex min-w-[900px] w-10/12 py-4">
+              <TypingTest
+                key={resetId}
+                text={snippet!.template}
+                onComplete={handleTestComplete}
+                onTestStart={() => setTypingState('in-progress')}
+                onStateChange={setTypingState}
+                width="100%"
+                height="auto"
+                typingState={typingState}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+      {/* Toggle sidebar action */}
+      <button
+        className={cx(
+          'text-white fixed left-2 top-3 bg-gray-950 p-2 rounded z-50',
+          'transition-opacity duration-200',
+          'hover:opacity-100',
+          sidebarOpen ? 'opacity-100' : 'opacity-50'
+        )}
+        onClick={toggleSidebar}
+      >
+        {IconSidebar}
+      </button>
+      {snippet && (
+        <button
+          className={cx(
+            'fixed top-4 right-4 z-50 text-white p-2 rounded-full bg-gray-950 transition-opacity duration-200 hover:opacity-100 opacity-50',
+            'bg-white/10'
+          )}
+          onClick={() => {
+            setSelectedId(null);
+            router.invalidate();
+          }}
+        >
+          <X size={16} />
+        </button>
+      )}
+      <Aside {...asideProps} dispatch={dispatch} />
+      <EditPopup {...modalState} dispatch={dispatch} />
+    </>
+  );
+}
