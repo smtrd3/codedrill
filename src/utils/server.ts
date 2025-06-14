@@ -24,7 +24,7 @@ export function gotoExternal(to: string) {
   throw redirect({ href: to });
 }
 
-export async function getAuthState() {
+export const getAuthState = createServerFn().handler(async () => {
   const headers = await getHeaders();
 
   if (isEmpty(headers)) {
@@ -36,7 +36,7 @@ export async function getAuthState() {
   });
 
   return user;
-}
+});
 
 export async function getUser() {
   const authState = await getAuthState();

@@ -1,0 +1,111 @@
+{
+  "../../../../~start/default-client-entry.tsx": {
+    "file": "assets/main-xYksC84u.js",
+    "name": "main",
+    "src": "../../../../~start/default-client-entry.tsx",
+    "isEntry": true,
+    "dynamicImports": [
+      "src/routes/new.tsx?tsr-split=component",
+      "src/routes/auth.tsx?tsr-split=component",
+      "src/routes/app.tsx?tsr-split=component",
+      "src/routes/index.tsx?tsr-split=component"
+    ],
+    "css": [
+      "assets/main-BlReLxdA.css"
+    ],
+    "assets": [
+      "assets/app-Zo1hiN_P.css"
+    ]
+  },
+  "/Users/smtrd3/projects/revdsa-app/src/styles/app.css": {
+    "file": "assets/app-Zo1hiN_P.css",
+    "src": "/Users/smtrd3/projects/revdsa-app/src/styles/app.css"
+  },
+  "_TypingTest-CnBe3O3c.js": {
+    "file": "assets/TypingTest-CnBe3O3c.js",
+    "name": "TypingTest",
+    "imports": [
+      "../../../../~start/default-client-entry.tsx",
+      "_createLucideIcon-Dbjz8fb2.js"
+    ]
+  },
+  "_auth-client-C5aphwgP.js": {
+    "file": "assets/auth-client-C5aphwgP.js",
+    "name": "auth-client",
+    "imports": [
+      "../../../../~start/default-client-entry.tsx"
+    ]
+  },
+  "_createLucideIcon-Dbjz8fb2.js": {
+    "file": "assets/createLucideIcon-Dbjz8fb2.js",
+    "name": "createLucideIcon",
+    "imports": [
+      "../../../../~start/default-client-entry.tsx"
+    ]
+  },
+  "_play-D_3ZoJ1e.js": {
+    "file": "assets/play-D_3ZoJ1e.js",
+    "name": "play",
+    "imports": [
+      "../../../../~start/default-client-entry.tsx",
+      "_createLucideIcon-Dbjz8fb2.js"
+    ]
+  },
+  "_snackbars-BvAtvfPU.js": {
+    "file": "assets/snackbars-BvAtvfPU.js",
+    "name": "snackbars",
+    "imports": [
+      "../../../../~start/default-client-entry.tsx"
+    ]
+  },
+  "src/routes/app.tsx?tsr-split=component": {
+    "file": "assets/app-HNHDwFm7.js",
+    "name": "app",
+    "src": "src/routes/app.tsx?tsr-split=component",
+    "isDynamicEntry": true,
+    "imports": [
+      "../../../../~start/default-client-entry.tsx",
+      "_createLucideIcon-Dbjz8fb2.js",
+      "_TypingTest-CnBe3O3c.js",
+      "_snackbars-BvAtvfPU.js",
+      "_auth-client-C5aphwgP.js",
+      "_play-D_3ZoJ1e.js"
+    ]
+  },
+  "src/routes/auth.tsx?tsr-split=component": {
+    "file": "assets/auth-AOwm052D.js",
+    "name": "auth",
+    "src": "src/routes/auth.tsx?tsr-split=component",
+    "isDynamicEntry": true,
+    "imports": [
+      "../../../../~start/default-client-entry.tsx",
+      "_snackbars-BvAtvfPU.js",
+      "_auth-client-C5aphwgP.js",
+      "_createLucideIcon-Dbjz8fb2.js"
+    ]
+  },
+  "src/routes/index.tsx?tsr-split=component": {
+    "file": "assets/index-ar-czRXQ.js",
+    "name": "index",
+    "src": "src/routes/index.tsx?tsr-split=component",
+    "isDynamicEntry": true,
+    "imports": [
+      "../../../../~start/default-client-entry.tsx",
+      "_TypingTest-CnBe3O3c.js",
+      "_auth-client-C5aphwgP.js",
+      "_play-D_3ZoJ1e.js",
+      "_createLucideIcon-Dbjz8fb2.js"
+    ]
+  },
+  "src/routes/new.tsx?tsr-split=component": {
+    "file": "assets/new-C6pJhX92.js",
+    "name": "new",
+    "src": "src/routes/new.tsx?tsr-split=component",
+    "isDynamicEntry": true,
+    "imports": [
+      "../../../../~start/default-client-entry.tsx",
+      "_TypingTest-CnBe3O3c.js",
+      "_createLucideIcon-Dbjz8fb2.js"
+    ]
+  }
+}

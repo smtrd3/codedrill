@@ -100,19 +100,6 @@ export function reducer(
     }
     case 'set_elapsed':
       return set(newState, 'elapsed', action.payload);
-    case 'pick_random': {
-      if (state.tests.length <= 1) return state;
-      let id = state.selectedId;
-      while (id == state.selectedId) {
-        const ramdomSelection = sample(state.tests);
-
-        if (ramdomSelection) {
-          id = ramdomSelection.id;
-        }
-      }
-
-      return set(newState, 'selectedId', id);
-    }
   }
 
   return newState;

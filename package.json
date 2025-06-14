@@ -10,7 +10,7 @@
     "format:fix": "prettier . -u --write **/*.{js,ts,tsx,json,css,md}",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
-    "start": "vite start"
+    "start": "bun ./.output/server/index.mjs"
   },
   "dependencies": {
     "@tanstack/react-router": "^1.121.12",
