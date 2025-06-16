@@ -14,6 +14,7 @@ import { runCompleteAnimation } from '~/components/confetti';
 import cx from 'classnames';
 import { handleAuthRedirect } from '~/utils/server';
 import { X } from 'lucide-react';
+import { queryClient } from '~/lib/client/queryClient';
 
 export const Route = createFileRoute('/app')({
   component: AppLayout,
@@ -138,7 +139,9 @@ function AppLayout() {
         accuracy: stats.accuracy,
       });
 
+      queryClient.invalidateQueries({ queryKey: ['daily-activity'] });
       router.invalidate();
+      setResetId(prev => prev + 1);
     },
     [onRandomize, setSelectedId, setTypingState, selectNext, snippet, router]
   );

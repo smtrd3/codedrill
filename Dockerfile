@@ -11,14 +11,14 @@ WORKDIR /app
 
 # Set production environment
 ENV NODE_ENV="production"
-
+ENV DB_FILE_NAME="file:/app/data/codedrill.db"
 
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
 # Install packages needed to build node modules
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential pkg-config python-is-python3
+    apt-get install --no-install-recommends -y build-essential pkg-config python-is-python3 sqlite3
 
 # Install node modules
 COPY bun.lock package.json ./
@@ -34,7 +34,6 @@ RUN bun --bun run build
 RUN rm -rf node_modules && \
     bun install --ci
 
-
 # Final stage for app image
 FROM base
 
@@ -43,4 +42,4 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD [ "bun", "run", "start" ]
+CMD bun run migrate && bun run start

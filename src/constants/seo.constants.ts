@@ -1,8 +1,8 @@
 // @ts-expect-error - Vite CSS URL import
 import appCss from '~/styles/app.css?url';
 
-const DESCRIPTION = `Make something cool. `;
-const TITLE = 'Artefact.sh - starter template';
+const DESCRIPTION = `Codedrill is a platform for learning and practicing coding.`;
+const TITLE = 'Codedrill - Learn to code';
 const KEY_WORDS = '';
 
 export const SEO_META_HEADERS = [

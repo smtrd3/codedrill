@@ -236,7 +236,9 @@ export const TypingTest: React.FC<TypingTestProps> = ({
   // Key press handler
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
-      if (isFinished || isFailed) return;
+      if (isFinished || isFailed) {
+        return;
+      }
       if (
         !startTime &&
         e.key.length === 1 &&
@@ -299,7 +301,7 @@ export const TypingTest: React.FC<TypingTestProps> = ({
 
   // Completion check
   useEffect(() => {
-    if (userInput.length === totalChars && !isFinished && startTime) {
+    if (userInput.length >= totalChars && !isFinished && startTime) {
       setIsFinished(true);
       const finalTime = (Date.now() - startTime) / 1000;
       const words = totalChars / AVERAGE_WORD_LENGTH;

@@ -1,111 +1,97 @@
-import dedent from 'dedent';
-
 export const SAMPLE_TEMPLATES = [
   {
     title: 'Binary search',
-    template: dedent`
-    function binarySearch(arr, target) {
-      let left = 0;
-      let right = arr.length - 1;
-      
-      while (left <= right) {
-        const mid = Math.floor((left + right) / 2);
-        
-        if (arr[mid] === target) {
-          return mid;
-        }
-        
-        if (arr[mid] < target) {
-          left = mid + 1;
-        } else {
-          right = mid - 1;
-        }
-      }
-    `,
+    template: `function binarySearch(arr, target) {
+  let left = 0;
+  let right = arr.length - 1;
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    if (arr[mid] === target) {
+      return mid;
+    }
+    if (arr[mid] < target) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+  return -1;
+}`,
   },
   {
     title: 'Bubble sort',
-    template: dedent`
-    function bubbleSort(arr) {
-      const n = arr.length;
-      
-      for (let i = 0; i < n - 1; i++) {
-        for (let j = 0; j < n - i - 1; j++) {
-          if (arr[j] > arr[j + 1]) {
-            // Swap arr[j] and arr[j+1]
-            const temp = arr[j];
-            arr[j] = arr[j + 1];
-            arr[j + 1] = temp;
-          }
-        }
+    template: `function bubbleSort(arr) {
+  const n = arr.length;
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = 0; j < n - i - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        const temp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = temp;
       }
-    `,
+    }
+  }
+  return arr;
+}`,
   },
   {
     title: 'Fibonacci sequence',
-    template: dedent`
-    function fibonacci(n) {
-      if (n <= 1) return n;
-      return fibonacci(n - 1) + fibonacci(n - 2);
-    }
-  `,
+    template: `function fibonacci(n) {
+  if (n <= 1) {
+    return n;
+  }
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}`,
   },
   {
     title: 'Factorial',
-    template: dedent`
-    function factorial(n) {
-      if (n <= 1) return 1;
-      return n * factorial(n - 1);
-    }
-  `,
+    template: `function factorial(n) {
+  if (n <= 1) {
+    return 1;
+  }
+  return n * factorial(n - 1);
+}`,
   },
   {
     title: 'Quick sort',
-    template: dedent`
-    function quickSort(arr) {
-      if (arr.length <= 1) return arr;
-      const pivot = arr[Math.floor(arr.length / 2)];
+    template: `function quickSort(arr) {
+  if (arr.length <= 1) {
+    return arr;
+  }
+  const pivot = arr[arr.length - 1];
+  const left = [];
+  const right = [];
+  for (let i = 0; i < arr.length - 1; i++) {
+    if (arr[i] < pivot) {
+      left.push(arr[i]);
+    } else {
+      right.push(arr[i]);
     }
-  `,
+  }
+  return [...quickSort(left), pivot, ...quickSort(right)];
+}`,
   },
   {
-    title: 'Merge sort',
-    template: dedent`
-    function mergeSort(arr) {
-      if (arr.length <= 1) return arr;
-    }
-  `,
+    title: 'Merge sort core algorithm',
+    template: `function mergeSort(arr) {
+  if (arr.length <= 1) {
+    return arr;
+  }
+  const mid = Math.floor(arr.length / 2);
+  const left = arr.slice(0, mid);
+  const right = arr.slice(mid);
+  return merge(mergeSort(left), mergeSort(right));
+}`,
   },
   {
     title: 'Linear search',
-    template: dedent`
-    function linearSearch(arr, target) {
-      for (let i = 0; i < arr.length; i++) {
+    template: `function linearSearch(arr, target) {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] === target) {
+      return i;
     }
-  `,
-  },
-  {
-    title: 'Binary search tree',
-    template: dedent`
-    class TreeNode {
-      constructor(value) {
-        this.value = value;
-        this.left = null;
-        this.right = null;
-      }
-    }
-  `,
-  },
-  {
-    title: 'Binary search tree',
-    template: dedent`
-    class TreeNode {
-      constructor(value) {
-        this.value = value;
-        this.left = null;
-        this.right = null;
-      }
-    }
-  `,
+  }
+  return -1;
+}`,
   },
 ];

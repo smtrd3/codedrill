@@ -7,6 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from '@tanstack/react-router';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { NotFound } from '~/components/NotFound';
@@ -15,6 +16,7 @@ import { SEO_LINKS, SEO_META_HEADERS } from '~/constants/seo.constants';
 import { If, Then } from 'react-if';
 import { Theme } from '@radix-ui/themes';
 import { Toaster } from 'react-hot-toast';
+import { queryClient } from '~/lib/client/queryClient';
 
 export const createRoute = createRootRouteFactory<{
   queryClient: QueryClient;
@@ -35,7 +37,9 @@ export const Route = createRoute({
   notFoundComponent: _d => <NotFound />,
   component: () => (
     <RootDocument>
-      <Outlet />
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+      </QueryClientProvider>
     </RootDocument>
   ),
 });

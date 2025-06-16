@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Code,
   Zap,
@@ -13,10 +13,11 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { TypingTest } from './TypingTest/TypingTest';
-import { AlertDialog, Button, Flex } from '@radix-ui/themes';
 import { Link } from '@tanstack/react-router';
 import { authClient } from '~/lib/client/auth-client';
 import { useQuery } from '@tanstack/react-query';
+import { runCompleteAnimation } from './confetti.js';
+import { If, Then } from 'react-if';
 
 const codeSnippet = `dfs(root) {
   if (root === null) return;
@@ -25,11 +26,7 @@ const codeSnippet = `dfs(root) {
 }`;
 
 export default function LandingPage() {
-  const [modalOpen, setModalOpen] = useState(false);
-
-  const onToggleModal = useCallback(() => {
-    setModalOpen(prev => !prev);
-  }, []);
+  const [demoTestStarted, setDemoTestStarted] = useState(false);
 
   const { data: session, isLoading } = useQuery({
     queryKey: ['session'],
@@ -60,14 +57,14 @@ export default function LandingPage() {
             Pattern Recognition Over Problem Solving
           </div>
           <h1 className="text-6xl font-bold mb-6 text-slate-50 font-['Inter']">
-            Master DSA Templates
+            Create & Master DSA Templates
             <br />
             <span className="text-indigo-600">Through Muscle Memory</span>
           </h1>
           <p className="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed font-['Inter']">
-            Stop wasting time thinking during interviews. Build lightning-fast
-            typing skills for DFS, BFS, DP, and 50+ other algorithmic patterns.
-            When templates are in your fingers, solutions flow naturally.
+            Stop wasting time writing boilerplate. Create your own templates for
+            DFS, BFS, DP, and more. Build lightning-fast typing skills and watch
+            solutions flow naturally.
           </p>
         </div>
 
@@ -86,9 +83,12 @@ export default function LandingPage() {
             <div className="bg-indigo-500/10 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Code className="w-8 h-8 text-indigo-400" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">50+ Templates</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              Create Your Templates
+            </h3>
             <p className="text-slate-400">
-              DFS, BFS, Sliding Window, Two Pointers, and more
+              Customize and practice the algorithmic patterns you want to
+              master.
             </p>
           </div>
           <div className="text-center">
@@ -111,17 +111,50 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl shadow-2xl shadow-indigo-900/20 mx-auto text-left">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold mb-4 text-slate-50 font-['Inter']">
+            Experience It Live
+          </h2>
+          <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+            Get a feel for the typing experience with our live demo.
+          </p>
+        </div>
+
+        <div className="rounded-md shadow-2xl shadow-indigo-900/20 mx-auto text-left relative group p-4">
+          {!demoTestStarted && (
+            <div
+              className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center rounded-md z-20 cursor-pointer"
+              onClick={() => setDemoTestStarted(true)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  setDemoTestStarted(true);
+                }
+              }}
+              role="button"
+              tabIndex={0}
+            >
+              <div className="bg-indigo-600 w-20 h-20 rounded-full flex items-center justify-center transform transition-transform group-hover:scale-110">
+                <Play
+                  className="w-10 h-10 text-white"
+                  style={{ transform: 'translateX(3px)' }}
+                />
+              </div>
+            </div>
+          )}
           <TypingTest
             text={codeSnippet}
             onComplete={() => {
-              onToggleModal();
+              setDemoTestStarted(false);
+              runCompleteAnimation();
+            }}
+            onFailed={() => {
+              setDemoTestStarted(false);
             }}
             onTestStart={() => {}}
             onStateChange={() => {}}
             showOptions={false}
-            key={modalOpen ? 'modal-open' : 'modal-closed'}
-            disableFocus={true}
+            key={`demo-typing-test-${demoTestStarted}`}
+            disableFocus={!demoTestStarted}
           />
         </div>
       </section>
@@ -131,11 +164,12 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-slate-50 font-['Inter']">
-              Why Memorization Wins
+              L1 cache for your brain
             </h2>
             <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              In the heat of an interview, thinking is slow. Muscle memory is
-              instant.
+              Optimize your mental architecture. Cache frequently-used
+              algorithms in your fastest memory layer for zero-latency recall
+              during interviews.
             </p>
           </div>
 
@@ -192,7 +226,7 @@ export default function LandingPage() {
 
             <div>
               <img
-                src="https://placehold.co/500x400/1e293b/94a3b8?text=Typing+Practice"
+                src="/brain-l1.png"
                 alt="Typing Practice Interface"
                 className="rounded-xl shadow-lg"
               />
@@ -207,7 +241,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
               <img
-                src="https://placehold.co/600x400/0f172a/94a3b8?text=Analytics+Dashboard"
+                src="/analytics.png"
                 alt="Analytics Dashboard"
                 className="rounded-xl shadow-lg"
               />
@@ -226,7 +260,7 @@ export default function LandingPage() {
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-500" />
                   <span className="text-slate-300">
-                    Words per minute for each template
+                    Words per minute for each of your templates
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -237,16 +271,14 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-slate-300">
-                    Accuracy trends over time
-                  </span>
+                  <span className="text-slate-300">Daily activity heatmap</span>
                 </div>
-                <div className="flex items-center gap-3">
+                {/* <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-500" />
                   <span className="text-slate-300">
                     Daily practice streaks and habits
                   </span>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -254,65 +286,72 @@ export default function LandingPage() {
       </section>
 
       {/* Modes Section */}
-      <section className="bg-slate-900 py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-slate-50 font-['Inter']">
-              Addictive Practice Modes
-            </h2>
-            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              Gamified experiences that make repetitive practice feel like play.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-slate-950 p-8 rounded-xl">
-              <div className="bg-purple-500/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6 text-purple-400" />
+      <If condition={false}>
+        <Then>
+          <section className="bg-slate-900 py-20">
+            <div className="max-w-6xl mx-auto px-6">
+              <div className="text-center mb-16">
+                <h2 className="text-4xl font-bold mb-4 text-slate-50 font-['Inter']">
+                  Addictive Practice Modes
+                </h2>
+                <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+                  Gamified experiences that make repetitive practice feel like
+                  play.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Speed Challenges</h3>
-              <p className="text-slate-400 mb-4">
-                Race against the clock to type templates faster each day.
-              </p>
-              <img
-                src="https://placehold.co/300x150/1e293b/94a3b8?text=Speed+Mode"
-                alt="Speed Challenge"
-                className="rounded-lg w-full"
-              />
-            </div>
 
-            <div className="bg-slate-950 p-8 rounded-xl">
-              <div className="bg-blue-500/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <Target className="w-6 h-6 text-blue-400" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Accuracy Focus</h3>
-              <p className="text-slate-400 mb-4">
-                Perfect your templates with zero-error challenges.
-              </p>
-              <img
-                src="https://placehold.co/300x150/1e293b/94a3b8?text=Accuracy+Mode"
-                alt="Accuracy Mode"
-                className="rounded-lg w-full"
-              />
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="bg-slate-950 p-8 rounded-xl">
+                  <div className="bg-purple-500/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                    <Zap className="w-6 h-6 text-purple-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3">
+                    Speed Challenges
+                  </h3>
+                  <p className="text-slate-400 mb-4">
+                    Race against the clock to type templates faster each day.
+                  </p>
+                  <img
+                    src="https://placehold.co/300x150/1e293b/94a3b8?text=Speed+Mode"
+                    alt="Speed Challenge"
+                    className="rounded-lg w-full"
+                  />
+                </div>
 
-            <div className="bg-slate-950 p-8 rounded-xl">
-              <div className="bg-green-500/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <BarChart3 className="w-6 h-6 text-green-400" />
+                <div className="bg-slate-950 p-8 rounded-xl">
+                  <div className="bg-blue-500/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                    <Target className="w-6 h-6 text-blue-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3">Accuracy Focus</h3>
+                  <p className="text-slate-400 mb-4">
+                    Perfect your templates with zero-error challenges.
+                  </p>
+                  <img
+                    src="https://placehold.co/300x150/1e293b/94a3b8?text=Accuracy+Mode"
+                    alt="Accuracy Mode"
+                    className="rounded-lg w-full"
+                  />
+                </div>
+
+                <div className="bg-slate-950 p-8 rounded-xl">
+                  <div className="bg-green-500/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                    <BarChart3 className="w-6 h-6 text-green-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3">Pattern Mix</h3>
+                  <p className="text-slate-400 mb-4">
+                    Random template combinations keep you sharp.
+                  </p>
+                  <img
+                    src="https://placehold.co/300x150/1e293b/94a3b8?text=Mix+Mode"
+                    alt="Pattern Mix"
+                    className="rounded-lg w-full"
+                  />
+                </div>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Pattern Mix</h3>
-              <p className="text-slate-400 mb-4">
-                Random template combinations keep you sharp.
-              </p>
-              <img
-                src="https://placehold.co/300x150/1e293b/94a3b8?text=Mix+Mode"
-                alt="Pattern Mix"
-                className="rounded-lg w-full"
-              />
             </div>
-          </div>
-        </div>
-      </section>
+          </section>
+        </Then>
+      </If>
 
       {/* CTA Section */}
       <section className="bg-indigo-600 py-20">
@@ -320,11 +359,6 @@ export default function LandingPage() {
           <h2 className="text-4xl font-bold mb-6 font-['Inter']">
             Ready to Build Coding Muscle Memory?
           </h2>
-          <p className="text-xl mb-8 text-indigo-100">
-            Join thousands of developers who&apos;ve turned algorithmic thinking
-            into automatic typing.
-          </p>
-
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <Link
               to="/auth"
@@ -335,10 +369,10 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          <p className="text-indigo-200 text-sm">
-            No signup required to start • 50+ templates included • Track your
-            progress
-          </p>
+          {/* <p className="text-indigo-200 text-sm">
+            No signup required to start • Create unlimited templates • Track
+            your progress
+          </p> */}
         </div>
       </section>
 
@@ -348,38 +382,18 @@ export default function LandingPage() {
           <div className="flex items-center justify-center mb-6">
             <Code className="w-8 h-8 text-indigo-400 mr-3" />
             <span className="text-xl font-semibold text-white font-['Inter']">
-              Code drills
+              CodeDrill
             </span>
           </div>
           <p className="mb-4">
             Making algorithmic interviews more about execution than inspiration.
           </p>
-          <p className="text-sm">
+          {/* <p className="text-sm">
             © 2025 TemplateType. Built for developers who believe practice
             makes permanent.
-          </p>
+          </p> */}
         </div>
       </footer>
-      <AlertDialog.Root open={modalOpen}>
-        <AlertDialog.Content maxWidth="450px">
-          <AlertDialog.Title>Test completed!</AlertDialog.Title>
-          <AlertDialog.Description size="2">
-            You&apos;ve completed the test.
-          </AlertDialog.Description>
-          <Flex justify="end" pt="4">
-            <AlertDialog.Action>
-              <Button
-                variant="soft"
-                color="indigo"
-                onClick={onToggleModal}
-                className="min-w-12"
-              >
-                Ok
-              </Button>
-            </AlertDialog.Action>
-          </Flex>
-        </AlertDialog.Content>
-      </AlertDialog.Root>
     </div>
   );
 }
