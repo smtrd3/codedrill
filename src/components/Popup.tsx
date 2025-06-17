@@ -49,8 +49,8 @@ export function EditPopup(props: PopupProps) {
         const value = (e.target as HTMLTextAreaElement).value;
         (e.target as HTMLTextAreaElement).value =
           value.slice(0, start) + '    ' + value.slice(end);
-        (e.target as HTMLTextAreaElement).selectionStart = start + 4;
-        (e.target as HTMLTextAreaElement).selectionEnd = start + 4;
+        (e.target as HTMLTextAreaElement).selectionStart = start + 2;
+        (e.target as HTMLTextAreaElement).selectionEnd = start + 2;
         setCode((e.target as HTMLTextAreaElement).value);
       }
     },

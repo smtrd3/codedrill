@@ -149,7 +149,7 @@ function AppLayout() {
   return (
     <>
       <div
-        className="w-full flex items-center flex-col text-white font-code min-h-screen"
+        className="w-full flex items-center flex-col bg-black text-white font-code min-h-screen"
         onClick={e => {
           e.stopPropagation();
           dispatch({ type: 'set_sidebar_state', payload: false });

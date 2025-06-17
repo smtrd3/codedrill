@@ -77,7 +77,7 @@ export function StatsContent(props: StatsContentProps) {
         </Link>
         <Button variant="ghost" onClick={signOut} style={{ cursor: 'pointer' }}>
           <LogOut className="cursor-pointer" size={16} />
-          Sign Out
+          <span className="font-sans font-bold">Sign Out</span>
         </Button>
       </div>
       <div

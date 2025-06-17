@@ -11,6 +11,8 @@ function getLevel(count: number) {
   return 3;
 }
 
+const theme = ['rgba(255, 255, 255, 0.05)', 'rgba(46, 204, 113, 1)'];
+
 export function DailyActivity() {
   const { data: activityData, isLoading } = useQuery({
     queryKey: ['daily-activity'],
@@ -31,13 +33,20 @@ export function DailyActivity() {
       loading={isLoading}
       data={activityData ?? []}
       theme={{
-        light: ['hsl(0, 0%, 92%)', 'rebeccapurple'],
-        dark: ['hsl(0, 0%, 22%)', 'hsl(225,92%,77%)'],
+        light: theme,
+        dark: theme,
       }}
       blockSize={12}
+      blockRadius={14}
       renderBlock={(block, activity) => {
         return (
-          <Tooltip content={`${activity.count} activities on ${activity.date}`}>
+          <Tooltip
+            content={
+              <span className="font-sans font-bold">
+                {activity.count} activities on {activity.date}
+              </span>
+            }
+          >
             {block}
           </Tooltip>
         );
