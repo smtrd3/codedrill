@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid';
 import { getUserId } from './server';
 import { get, unset } from 'lodash-es';
 import { createServerFn } from '@tanstack/react-start';
-import { eq, and, gte, lte, max, min, sql } from 'drizzle-orm';
+import { eq, and, gte, lte, max, min, sql, count } from 'drizzle-orm';
 import { activity, metadata, templates } from '~/db/schema';
 import { authMiddleware } from '~/middleware/auth.middleware';
 import { SAMPLE_TEMPLATES } from '~/app.constants';
@@ -23,6 +23,15 @@ const createTemplate = createServerFn()
     const userId = await getUserId();
     if (!userId) {
       throw new Error('User not found');
+    }
+
+    const templateCount = await db
+      .select({ count: count() })
+      .from(templates)
+      .where(eq(templates.userId, userId));
+
+    if (get(templateCount, [0, 'count'], 0) >= 25) {
+      throw new Error('You have reached the maximum number of templates');
     }
 
     const result = await db

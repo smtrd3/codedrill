@@ -9,8 +9,11 @@ import { initialState, reducer, TestState } from '~/state';
 import { DAO } from '~/utils/dao';
 import { find, findIndex, sample, size } from 'lodash-es';
 import { StatsContent } from '~/components/StatsContent';
-import { TestStats, TypingTest } from '~/components/TypingTest/TypingTest';
-import { runCompleteAnimation } from '~/components/confetti';
+import {
+  TestStats,
+  TypingOption,
+  TypingTest,
+} from '~/components/TypingTest/TypingTest';
 import cx from 'classnames';
 import { handleAuthRedirect } from '~/utils/server';
 import { X } from 'lucide-react';
@@ -42,6 +45,14 @@ function AppLayout() {
   const snippet = useMemo(
     () => find(testsFromState, { uuid: selectedId }),
     [testsFromState, selectedId]
+  );
+  const [enabledOptions, setEnabledOptions] = useState<Set<TypingOption>>(
+    () => {
+      const initialOptions = new Set<TypingOption>();
+      initialOptions.add('power-mode');
+      initialOptions.add('repeat');
+      return initialOptions;
+    }
   );
 
   const toggleSidebar = useCallback(
@@ -100,19 +111,24 @@ function AppLayout() {
     dispatch({ type: 'replace', payload: tests });
   }, [tests]);
 
-  const selectNext = useCallback(() => {
-    if (size(testsFromState) > 1) {
-      const idx = findIndex(testsFromState, item => item.uuid === selectedId);
-      const nextIdx = (idx + 1) % size(testsFromState);
-      const nextId = testsFromState[nextIdx].uuid;
+  const selectNext = useCallback(
+    (isPrevious: boolean = false) => {
+      if (size(testsFromState) > 1) {
+        const idx = findIndex(testsFromState, item => item.uuid === selectedId);
+        const nextIdx = isPrevious
+          ? (idx - 1 + size(testsFromState)) % size(testsFromState)
+          : (idx + 1) % size(testsFromState);
+        const nextId = testsFromState[nextIdx].uuid;
 
-      if (nextId) {
-        dispatch({ type: 'set_selected', payload: nextId });
+        if (nextId) {
+          dispatch({ type: 'set_selected', payload: nextId });
+        }
+      } else {
+        setResetId(prev => prev + 1);
       }
-    } else {
-      setResetId(prev => prev + 1);
-    }
-  }, [testsFromState, selectedId, dispatch]);
+    },
+    [testsFromState, selectedId, dispatch]
+  );
 
   const handleTestComplete = useCallback(
     async (stats: TestStats) => {
@@ -120,15 +136,12 @@ function AppLayout() {
 
       setTypingState('complete');
 
-      if (stats.typingOptions.has('back-to-back')) {
-        if (stats.typingOptions.has('randomization')) {
-          onRandomize();
-        } else {
-          selectNext();
-        }
+      if (stats.typingOptions.has('repeat')) {
+        setResetId(prev => prev + 1);
+      } else if (stats.typingOptions.has('randomization')) {
+        onRandomize();
       } else {
-        runCompleteAnimation();
-        setSelectedId(null);
+        selectNext();
       }
 
       await DAO.updateStats({
@@ -143,7 +156,7 @@ function AppLayout() {
       router.invalidate();
       setResetId(prev => prev + 1);
     },
-    [onRandomize, setSelectedId, setTypingState, selectNext, snippet, router]
+    [onRandomize, setTypingState, selectNext, snippet, router]
   );
 
   return (
@@ -184,6 +197,10 @@ function AppLayout() {
                 width="100%"
                 height="auto"
                 typingState={typingState}
+                onPrevious={() => selectNext(true)}
+                onNext={() => selectNext(false)}
+                enabledOptions={enabledOptions}
+                setEnabledOptions={setEnabledOptions}
               />
             </div>
           </div>

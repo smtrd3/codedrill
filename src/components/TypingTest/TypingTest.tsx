@@ -9,7 +9,16 @@ import React, {
   KeyboardEvent,
   ComponentType,
 } from 'react';
-import { Timer, Zap, Repeat, Skull, Dice3, RefreshCw } from 'lucide-react';
+import {
+  Timer,
+  Zap,
+  Repeat,
+  Skull,
+  Dice3,
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { AlertDialog, Badge, BadgeProps, Button, Flex } from '@radix-ui/themes';
 import { Character, CharacterProps } from './Character';
 import { useInterval } from './hooks/useInterval';
@@ -27,9 +36,9 @@ export interface Particle {
   color: string;
 }
 
-type TypingOption =
+export type TypingOption =
   | 'power-mode'
-  | 'back-to-back'
+  | 'repeat'
   | 'randomization'
   | 'instant-death';
 
@@ -54,6 +63,10 @@ interface TypingTestProps {
   showOptions?: boolean;
   disableFocus?: boolean;
   typingState?: TestState;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  enabledOptions?: Set<TypingOption>;
+  setEnabledOptions?: React.Dispatch<React.SetStateAction<Set<TypingOption>>>;
 }
 
 const TEST_STATE_CONFIG: Record<TestState, { color: string; label: string }> = {
@@ -91,10 +104,10 @@ const typingOptionsConfig: {
     ariaLabel: 'Toggle Power Mode',
   },
   {
-    option: 'back-to-back',
+    option: 'repeat',
     Icon: Repeat,
-    tooltip: 'Enable back to back mode',
-    ariaLabel: 'Toggle Back-to-back Mode',
+    tooltip: 'Repeat the same template',
+    ariaLabel: 'Repeat the same template',
   },
   {
     option: 'randomization',
@@ -118,11 +131,14 @@ export const TypingTest: React.FC<TypingTestProps> = ({
   onFailed,
   width = '100%',
   height = 'auto',
-  powerMode = true,
   onStateChange,
   showOptions = true,
   disableFocus = false,
   typingState = 'initial',
+  onPrevious,
+  onNext,
+  enabledOptions = new Set<TypingOption>(),
+  setEnabledOptions,
 }) => {
   const [userInput, setUserInput] = useState<string>('');
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -132,16 +148,6 @@ export const TypingTest: React.FC<TypingTestProps> = ({
   const [isFailed, setIsFailed] = useState<boolean>(false);
   const [failureMessage, setFailureMessage] = useState<string>('');
   const [particles, setParticles] = useState<Particle[]>([]);
-  const [enabledOptions, setEnabledOptions] = useState<Set<TypingOption>>(
-    () => {
-      const initialOptions = new Set<TypingOption>();
-      if (powerMode) {
-        initialOptions.add('power-mode');
-        initialOptions.add('back-to-back');
-      }
-      return initialOptions;
-    }
-  );
 
   const containerRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLSpanElement>(null);
@@ -222,7 +228,7 @@ export const TypingTest: React.FC<TypingTestProps> = ({
   }, []);
 
   const handleOptionToggle = useCallback((option: TypingOption) => {
-    setEnabledOptions(prev => {
+    setEnabledOptions?.(prev => {
       const newOptions = new Set(prev);
       if (newOptions.has(option)) {
         newOptions.delete(option);
@@ -423,29 +429,55 @@ export const TypingTest: React.FC<TypingTestProps> = ({
           <div className="h-full content-start font-code">{characters}</div>
         </div>
         {showOptions && (
-          <div className="mt-8 flex w-full justify-center gap-2">
-            {typingOptionsConfig.map(({ option, Icon, tooltip, ariaLabel }) => (
-              <div
-                key={option}
-                className="relative group flex flex-col items-center"
-              >
-                <button
-                  type="button"
-                  onClick={() => handleOptionToggle(option)}
-                  className={`p-2 rounded-md transition-colors duration-200 ${
-                    enabledOptions.has(option)
-                      ? 'bg-slate-900 text-cyan-400'
-                      : 'text-slate-500 hover:bg-slate-900 hover:text-slate-300'
-                  }`}
-                  aria-label={ariaLabel}
-                >
-                  <Icon size={18} />
-                </button>
-                <div className="pointer-events-none absolute top-full mt-2 w-max rounded-md bg-slate-800 px-2 py-1 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 font-code">
-                  {tooltip}
-                </div>
-              </div>
-            ))}
+          <div className="flex justify-between items-center px-4 py-2">
+            <Button
+              variant="ghost"
+              color="gray"
+              size={'4'}
+              style={{ cursor: 'pointer' }}
+              radius="small"
+              onClick={onPrevious}
+            >
+              <ChevronLeft size={18} />
+            </Button>
+
+            <div className="flex w-full justify-center gap-2">
+              {typingOptionsConfig.map(
+                ({ option, Icon, tooltip, ariaLabel }) => (
+                  <div
+                    key={option}
+                    className="relative group flex flex-col items-center"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleOptionToggle(option)}
+                      className={`p-2 rounded-md transition-colors duration-200 ${
+                        enabledOptions.has(option)
+                          ? 'bg-slate-900 text-cyan-400'
+                          : 'text-slate-500 hover:bg-slate-900 hover:text-slate-300'
+                      }`}
+                      aria-label={ariaLabel}
+                    >
+                      <Icon size={18} />
+                    </button>
+                    <div className="pointer-events-none absolute top-full mt-2 w-max rounded-md bg-slate-800 px-2 py-1 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 font-code">
+                      {tooltip}
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+
+            <Button
+              variant="ghost"
+              color="gray"
+              size={'4'}
+              style={{ cursor: 'pointer' }}
+              radius="small"
+              onClick={onNext}
+            >
+              <ChevronRight size={18} />
+            </Button>
           </div>
         )}
       </div>
