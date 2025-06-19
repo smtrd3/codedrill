@@ -40,21 +40,181 @@ export function EditPopup(props: PopupProps) {
     []
   );
 
-  const onCodeKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Tab') {
-        e.preventDefault();
-        const start = (e.target as HTMLTextAreaElement).selectionStart;
-        const end = (e.target as HTMLTextAreaElement).selectionEnd;
-        const value = (e.target as HTMLTextAreaElement).value;
-        (e.target as HTMLTextAreaElement).value =
-          value.slice(0, start) + '    ' + value.slice(end);
-        (e.target as HTMLTextAreaElement).selectionStart = start + 2;
-        (e.target as HTMLTextAreaElement).selectionEnd = start + 2;
-        setCode((e.target as HTMLTextAreaElement).value);
+  const handleTab = useCallback(
+    (
+      textarea: HTMLTextAreaElement,
+      value: string,
+      selectionStart: number,
+      selectionEnd: number
+    ): void => {
+      const indent = '  '; // 2 spaces
+
+      // Case 1: No selection - simple insertion
+      if (selectionStart === selectionEnd) {
+        const newValue =
+          value.slice(0, selectionStart) + indent + value.slice(selectionStart);
+        const newCursorPos = selectionStart + indent.length;
+
+        updateTextarea(textarea, newValue, newCursorPos, newCursorPos);
+        return;
       }
+
+      // Case 2: Text selection - indent each line
+      const beforeSelection = value.slice(0, selectionStart);
+      // const selectedText = value.slice(selectionStart, selectionEnd);
+      const afterSelection = value.slice(selectionEnd);
+
+      // Find the start of the first line in selection
+      const lastNewlineBeforeSelection = beforeSelection.lastIndexOf('\n');
+      const lineStart =
+        lastNewlineBeforeSelection === -1 ? 0 : lastNewlineBeforeSelection + 1;
+
+      // Get the full lines that are affected by the selection
+      const textFromLineStart = value.slice(lineStart, selectionEnd);
+      const lines = textFromLineStart.split('\n');
+
+      // Indent each line
+      const indentedLines = lines.map(line => indent + line);
+      const indentedText = indentedLines.join('\n');
+
+      // Calculate new positions
+      const newValue =
+        value.slice(0, lineStart) + indentedText + afterSelection;
+      const addedChars = indentedLines.length * indent.length;
+
+      // Adjust selection to include the newly indented content
+      const newSelectionStart = selectionStart + indent.length;
+      const newSelectionEnd = selectionEnd + addedChars;
+
+      updateTextarea(textarea, newValue, newSelectionStart, newSelectionEnd);
     },
     []
+  );
+
+  const updateTextarea = useCallback(
+    (
+      textarea: HTMLTextAreaElement,
+      newValue: string,
+      selectionStart: number,
+      selectionEnd: number
+    ): void => {
+      // Store scroll position to prevent jumping
+      const scrollTop = textarea.scrollTop;
+      const scrollLeft = textarea.scrollLeft;
+
+      // Update value
+      textarea.value = newValue;
+
+      // Restore cursor/selection
+      textarea.setSelectionRange(selectionStart, selectionEnd);
+
+      // Restore scroll position
+      textarea.scrollTop = scrollTop;
+      textarea.scrollLeft = scrollLeft;
+
+      // Trigger input event for React/Vue compatibility
+      const inputEvent = new Event('input', { bubbles: true });
+      textarea.dispatchEvent(inputEvent);
+    },
+    []
+  );
+
+  const handleShiftTab = useCallback(
+    (
+      textarea: HTMLTextAreaElement,
+      value: string,
+      selectionStart: number,
+      selectionEnd: number
+    ): void => {
+      const indent = '  '; // 2 spaces to remove
+
+      // Case 1: No selection - remove indent from current line
+      if (selectionStart === selectionEnd) {
+        const beforeCursor = value.slice(0, selectionStart);
+        const lastNewlineIndex = beforeCursor.lastIndexOf('\n');
+        const lineStart = lastNewlineIndex === -1 ? 0 : lastNewlineIndex + 1;
+        const currentLine = value.slice(
+          lineStart,
+          value.indexOf('\n', selectionStart)
+        );
+
+        // Check if line starts with our indent
+        if (currentLine.startsWith(indent)) {
+          const newValue =
+            value.slice(0, lineStart) +
+            currentLine.slice(indent.length) +
+            value.slice(lineStart + currentLine.length);
+          const newCursorPos = Math.max(
+            lineStart,
+            selectionStart - indent.length
+          );
+
+          updateTextarea(textarea, newValue, newCursorPos, newCursorPos);
+        }
+        return;
+      }
+
+      // Case 2: Text selection - outdent each line
+      const beforeSelection = value.slice(0, selectionStart);
+      const afterSelection = value.slice(selectionEnd);
+
+      // Find the start of the first line in selection
+      const lastNewlineBeforeSelection = beforeSelection.lastIndexOf('\n');
+      const lineStart =
+        lastNewlineBeforeSelection === -1 ? 0 : lastNewlineBeforeSelection + 1;
+
+      // Get the full lines that are affected by the selection
+      const textFromLineStart = value.slice(lineStart, selectionEnd);
+      const lines = textFromLineStart.split('\n');
+
+      // Outdent each line that starts with our indent
+      let removedChars = 0;
+      const outdentedLines = lines.map((line, index) => {
+        if (line.startsWith(indent)) {
+          removedChars += indent.length;
+          return line.slice(indent.length);
+        }
+        return line;
+      });
+
+      const outdentedText = outdentedLines.join('\n');
+      const newValue =
+        value.slice(0, lineStart) + outdentedText + afterSelection;
+
+      // Calculate new selection positions
+      const firstLineIndentRemoved = lines[0].startsWith(indent)
+        ? indent.length
+        : 0;
+      const newSelectionStart = Math.max(
+        lineStart,
+        selectionStart - firstLineIndentRemoved
+      );
+      const newSelectionEnd = selectionEnd - removedChars;
+
+      updateTextarea(textarea, newValue, newSelectionStart, newSelectionEnd);
+    },
+    [updateTextarea]
+  );
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLTextAreaElement>): void => {
+      if (event.key !== 'Tab') return;
+
+      // Prevent default tab behavior (focus change)
+      event.preventDefault();
+
+      const textarea = event.target as HTMLTextAreaElement;
+      const { value, selectionStart, selectionEnd } = textarea;
+
+      // Handle Shift+Tab (outdent)
+      if (event.shiftKey) {
+        handleShiftTab(textarea, value, selectionStart, selectionEnd);
+      } else {
+        // Handle regular Tab (indent)
+        handleTab(textarea, value, selectionStart, selectionEnd);
+      }
+    },
+    [handleShiftTab, handleTab]
   );
 
   const validate = useCallback(() => {
@@ -178,7 +338,7 @@ export function EditPopup(props: PopupProps) {
               className="[&>textarea]:font-code [&>textarea]:whitespace-pre [&>textarea]:font-bold"
               value={code}
               onChange={onCodeChange}
-              onKeyDown={onCodeKeyDown}
+              onKeyDown={handleKeyDown}
             />
           </label>
         </Flex>
