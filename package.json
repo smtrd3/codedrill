@@ -30,6 +30,7 @@
     "dedent": "^1.6.0",
     "drizzle-orm": "^0.39.3",
     "eventemitter3": "^5.0.1",
+    "indent-textarea": "^4.0.0",
     "level": "^10.0.0",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.513.0",
