@@ -17,6 +17,7 @@ import {
   indentSelection,
   unindentSelection,
 } from 'indent-textarea';
+import { useRouter } from '@tanstack/react-router';
 
 type PopupProps = State['modalState'] & {
   dispatch: ActionDispatcher;
@@ -24,7 +25,7 @@ type PopupProps = State['modalState'] & {
 
 export function EditPopup(props: PopupProps) {
   const { open, editItem, mode, dispatch } = props;
-
+  const router = useRouter();
   const [title, setTitle] = useState('');
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
@@ -51,8 +52,8 @@ export function EditPopup(props: PopupProps) {
       return false;
     }
 
-    if (code.length < 10) {
-      snackbar.error('Code should be at least 10 characters long');
+    if (code.length < 28) {
+      snackbar.error('Code snippet is too short');
       return false;
     }
 
@@ -62,7 +63,8 @@ export function EditPopup(props: PopupProps) {
   const onSave = useCallback(async () => {
     if (validate()) {
       const cleanCode = (code || '')
-        .replaceAll('\n\n', '\n')
+        .replace(/\n+/, '\n')
+        .replaceAll('\t', '    ')
         .split('\n')
         .map(line => line.trimEnd())
         .filter(line => line !== '')
@@ -109,6 +111,7 @@ export function EditPopup(props: PopupProps) {
       await DAO.deleteTemplate(editItemId);
       dispatch({ type: 'delete_test', payload: editItemId });
       dispatch({ type: 'set_modal_state', payload: { open: false } });
+      router.invalidate();
       snackbar.success('Test deleted successfully');
     } catch {
       snackbar.error('Snippet deletion failed');

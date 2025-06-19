@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { db } from '~/db/connection';
 import { nanoid } from 'nanoid';
 import { getUserId } from './server';
-import { get, unset } from 'lodash-es';
+import { get, trimEnd, unset } from 'lodash-es';
 import { createServerFn } from '@tanstack/react-start';
 import { eq, and, gte, lte, max, min, sql, count } from 'drizzle-orm';
 import { activity, metadata, templates } from '~/db/schema';
@@ -33,6 +33,14 @@ const createTemplate = createServerFn()
     if (get(templateCount, [0, 'count'], 0) >= 25) {
       throw new Error('You have reached the maximum number of templates');
     }
+
+    ctx.data.template = (ctx.data.template || '')
+      .replace(/\n+/, '\n')
+      .replaceAll('\t', '    ')
+      .split('\n')
+      .map(line => trimEnd(line))
+      .filter(line => line !== '')
+      .join('\n');
 
     const result = await db
       .insert(templates)
