@@ -15,6 +15,7 @@ const createTemplate = createServerFn()
     const schema = z.object({
       title: z.string().max(255),
       template: z.string().max(8000),
+      category: z.number().min(1).max(7).optional(),
     });
 
     return schema.parse(input);
@@ -94,6 +95,7 @@ const updateTemplate = createServerFn()
       template: z.string().max(8000),
       count: z.number().optional(),
       totalTime: z.number().optional(),
+      category: z.number().optional(),
     });
 
     return schema.parse(input);
@@ -107,8 +109,6 @@ const updateTemplate = createServerFn()
     const queryId = ctx.data.uuid;
     unset(ctx.data, 'id'); // remove id from the data as it violates the unique constraint
     unset(ctx.data, 'uuid'); // remove uuid from the data as it violates the unique constraint
-
-    console.log(ctx.data, queryId);
 
     await db
       .update(templates)
@@ -316,13 +316,14 @@ export const DAO = {
     template: string;
     count?: number;
     totalTime?: number;
+    category: number;
   }) {
     return updateTemplate({ data: item });
   },
   deleteTemplate(id: string | number) {
     return deleteItem({ data: { id } });
   },
-  createTemplate(item: { title: string; template: string }) {
+  createTemplate(item: { title: string; template: string; category: number }) {
     return createTemplate({ data: item });
   },
   updateStats(stats: {

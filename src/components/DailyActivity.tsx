@@ -3,6 +3,7 @@ import ActivityCalendar from 'react-activity-calendar';
 import { DAO } from '~/utils/dao';
 import { useQuery } from '@tanstack/react-query';
 import { map } from 'lodash-es';
+import { memo } from 'react';
 
 function getLevel(count: number) {
   if (count < 1) return 0;
@@ -13,7 +14,7 @@ function getLevel(count: number) {
 
 const theme = ['rgba(255, 255, 255, 0.05)', 'rgba(46, 204, 113, 1)'];
 
-export function DailyActivity() {
+export const DailyActivity = memo(function DailyActivityImpl() {
   const { data: activityData, isLoading } = useQuery({
     queryKey: ['daily-activity'],
     queryFn: async () => {
@@ -53,4 +54,4 @@ export function DailyActivity() {
       }}
     />
   );
-}
+});

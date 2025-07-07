@@ -1,4 +1,4 @@
-import { map, reject, sample, set } from 'lodash-es';
+import { map, reject, set } from 'lodash-es';
 
 export type TestState =
   | 'initial'
@@ -14,6 +14,7 @@ export type TestItem = {
   template: string;
   count: number;
   totalTime: number;
+  category: number;
 };
 
 export type State = {
@@ -27,6 +28,7 @@ export type State = {
   timerId?: number;
   allowEdit?: boolean;
   modalOpen: boolean;
+  selectedCategory: number;
   modalState: {
     open: boolean;
     mode: 'edit' | 'create';
@@ -49,6 +51,7 @@ export const initialState: State = {
   timerId: undefined,
   allowEdit: true,
   modalOpen: false,
+  selectedCategory: 1,
   modalState: {
     open: false,
     mode: 'create',
@@ -64,6 +67,9 @@ export function reducer(
   const newState = { ...state };
 
   switch (type) {
+    case 'set_category':
+      set(newState, 'selectedId', undefined);
+      return set(newState, 'selectedCategory', payload);
     case 'replace':
       return set(newState, 'tests', payload);
     case 'set_selected':

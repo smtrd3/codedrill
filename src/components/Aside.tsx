@@ -8,6 +8,7 @@ import { Plus, Edit, Trash } from 'lucide-react';
 import { ActionDispatcher, TestItem } from '~/state';
 import { DAO } from '~/utils/dao';
 import { useRouter } from '@tanstack/react-router';
+import { Categories } from './Categories';
 
 type AsideProps = {
   selectedId?: string | null;
@@ -15,11 +16,19 @@ type AsideProps = {
   testState: string;
   sidebarOpen: boolean;
   dispatch: ActionDispatcher;
+  selectedCategory: number;
 };
 
 export function Aside(props: AsideProps) {
   const router = useRouter();
-  const { selectedId, tests: items, testState, sidebarOpen, dispatch } = props;
+  const {
+    selectedId,
+    tests: items,
+    testState,
+    sidebarOpen,
+    dispatch,
+    selectedCategory,
+  } = props;
   const allowEdit = useMemo(() => testState !== 'in-progress', [testState]);
 
   const stopPropagation = useCallback(
@@ -32,9 +41,13 @@ export function Aside(props: AsideProps) {
   const createNew = useCallback(() => {
     dispatch({
       type: 'set_modal_state',
-      payload: { open: true, mode: 'create', editItem: undefined },
+      payload: {
+        open: true,
+        mode: 'create',
+        editItem: { category: selectedCategory },
+      },
     });
-  }, [dispatch]);
+  }, [dispatch, selectedCategory]);
 
   const editItem = useCallback(
     (item: TestItem) => {
@@ -66,6 +79,13 @@ export function Aside(props: AsideProps) {
     [dispatch]
   );
 
+  const setCategory = useCallback(
+    (id: number) => {
+      dispatch({ type: 'set_category', payload: id });
+    },
+    [dispatch]
+  );
+
   return (
     <div
       id="side-bar"
@@ -89,6 +109,9 @@ export function Aside(props: AsideProps) {
         >
           <Plus size={18} className="cursor-pointer" />
         </IconButton>
+      </div>
+      <div className="pl-4 mb-4">
+        <Categories category={selectedCategory} setCategory={setCategory} />
       </div>
       <div className="flex-grow overflow-x-hidden overflow-y-auto">
         {map(items, item => (

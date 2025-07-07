@@ -10,7 +10,7 @@ import {
   sortBy,
   sumBy,
 } from 'lodash-es';
-import { useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { ListChecks, Timer, Zap, Play, Plus, LogOut } from 'lucide-react';
 import { authClient } from '~/lib/client/auth-client';
 import { Link, useNavigate } from '@tanstack/react-router';
@@ -49,7 +49,9 @@ function StatCard({ icon, title, value, unit }: StatCardProps) {
   );
 }
 
-export function StatsContent(props: StatsContentProps) {
+export const StatsContent = memo(function StatsContentImpl(
+  props: StatsContentProps
+) {
   const { items, onStartTest, onCreateTest } = props;
   const sortedItems = sortBy(items, 'count').reverse();
   const navigate = useNavigate();
@@ -198,4 +200,4 @@ export function StatsContent(props: StatsContentProps) {
       </Flex>
     </Flex>
   );
-}
+});

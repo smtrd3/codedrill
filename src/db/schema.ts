@@ -17,6 +17,7 @@ export const templates = sqliteTable('templates', {
   totalTime: int().notNull().default(0),
   bestWpm: int().notNull().default(0),
   metadata: text().default('{}'),
+  category: int().notNull().default(1),
 });
 
 export const activity = sqliteTable('activity', {

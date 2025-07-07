@@ -7,7 +7,7 @@ import {
   TextArea,
   TextField,
 } from '@radix-ui/themes';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { DAO } from '~/utils/dao';
 import { ActionDispatcher, State } from '~/state';
 import { If, Then } from 'react-if';
@@ -18,17 +18,19 @@ import {
   unindentSelection,
 } from 'indent-textarea';
 import { useRouter } from '@tanstack/react-router';
+import { Categories } from './Categories';
 
 type PopupProps = State['modalState'] & {
   dispatch: ActionDispatcher;
 };
 
-export function EditPopup(props: PopupProps) {
+function EditPopupImpl(props: PopupProps) {
   const { open, editItem, mode, dispatch } = props;
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
+  const [category, setCategory] = useState(editItem?.category || 1);
 
   const editItemId = useMemo(() => editItem?.uuid, [editItem?.uuid]);
 
@@ -72,11 +74,16 @@ export function EditPopup(props: PopupProps) {
 
       if (editItemId) {
         const curr = await DAO.getTemplate(editItemId);
-        const updated = { ...curr, title, template: cleanCode };
+        const updated = { ...curr, title, template: cleanCode, category };
 
         try {
           await DAO.updateTemplate(
-            updated as { uuid: string; title: string; template: string }
+            updated as {
+              uuid: string;
+              title: string;
+              template: string;
+              category: number;
+            }
           );
           dispatch({ type: 'update_test', payload: updated });
           dispatch({ type: 'set_modal_state', payload: { open: false } });
@@ -88,6 +95,7 @@ export function EditPopup(props: PopupProps) {
           const newTest = await DAO.createTemplate({
             title,
             template: cleanCode,
+            category: category,
           });
 
           dispatch({ type: 'add_test', payload: newTest });
@@ -99,7 +107,7 @@ export function EditPopup(props: PopupProps) {
       // need work
       snackbar.success('Snippet saved!');
     }
-  }, [editItemId, validate, code, title, dispatch]);
+  }, [validate, code, editItemId, title, category, dispatch]);
 
   const onDelete = useCallback(async () => {
     if (busy) return;
@@ -118,7 +126,7 @@ export function EditPopup(props: PopupProps) {
     } finally {
       setBusy(false);
     }
-  }, [busy, editItemId, dispatch]);
+  }, [busy, editItemId, dispatch, router]);
 
   const onKeyDown = useCallback((e: React.KeyboardEvent) => {
     const target = e.target as HTMLTextAreaElement;
@@ -137,7 +145,8 @@ export function EditPopup(props: PopupProps) {
   useEffect(() => {
     setTitle(editItem?.title || '');
     setCode(editItem?.template || '');
-  }, [editItem?.title, editItem?.template]);
+    setCategory(editItem?.category || 1);
+  }, [editItem?.title, editItem?.template, editItem?.category]);
 
   useEffect(() => {
     if (open && mode === 'create') {
@@ -156,7 +165,12 @@ export function EditPopup(props: PopupProps) {
         <Dialog.Title className="font-code">
           {mode === 'edit' ? 'Update code snippet' : 'Add new snippet'}
         </Dialog.Title>
-        <Dialog.Description></Dialog.Description>
+        <Flex direction="column" gap="2" mb="2">
+          <Text as="div" size="2" mb="1" weight="bold">
+            Category
+          </Text>
+          <Categories category={category} setCategory={setCategory} />
+        </Flex>
         <Flex direction="column" gap="3">
           <label>
             <Text as="div" size="2" mb="1" weight="bold">
@@ -184,7 +198,7 @@ export function EditPopup(props: PopupProps) {
             <TextArea
               id="code-input"
               placeholder="console.log('Hello world!')"
-              rows={24}
+              rows={18}
               className="[&>textarea]:font-code [&>textarea]:whitespace-pre [&>textarea]:font-bold"
               value={code}
               onChange={onCodeChange}
@@ -228,3 +242,5 @@ export function EditPopup(props: PopupProps) {
     </Dialog.Root>
   );
 }
+
+export const EditPopup = memo(EditPopupImpl);

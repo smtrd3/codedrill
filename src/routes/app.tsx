@@ -7,7 +7,7 @@ import { IconSidebar } from '~/components/icons';
 import { EditPopup } from '~/components/Popup';
 import { initialState, reducer, TestState } from '~/state';
 import { DAO } from '~/utils/dao';
-import { find, findIndex, sample, size } from 'lodash-es';
+import { filter, find, findIndex, get, sample, size } from 'lodash-es';
 import { StatsContent } from '~/components/StatsContent';
 import {
   TestStats,
@@ -38,10 +38,17 @@ function AppLayout() {
     tests: tests,
   }));
   const [resetId, setResetId] = useState(0);
-  const testsFromState = useMemo(() => state.tests, [state.tests]);
   const selectedId = useMemo(() => state.selectedId, [state.selectedId]);
   const typingState = useMemo(() => state.testState, [state.testState]);
   const sidebarOpen = useMemo(() => state.sidebarOpen, [state.sidebarOpen]);
+  const selectedCategory = useMemo(
+    () => state.selectedCategory,
+    [state.selectedCategory]
+  );
+  const testsFromState = useMemo(
+    () => filter([...state.tests], { category: selectedCategory }),
+    [selectedCategory, state.tests]
+  );
   const snippet = useMemo(
     () => find(testsFromState, { uuid: selectedId }),
     [testsFromState, selectedId]
@@ -92,24 +99,31 @@ function AppLayout() {
 
   const asideProps = useMemo(() => {
     return {
-      tests: state.tests,
+      tests: testsFromState,
       sidebarOpen: state.sidebarOpen,
       testState: state.testState,
       selectedId: state.selectedId,
+      selectedCategory,
     };
-  }, [state.tests, state.sidebarOpen, state.testState, state.selectedId]);
+  }, [
+    testsFromState,
+    state.sidebarOpen,
+    state.testState,
+    state.selectedId,
+    selectedCategory,
+  ]);
 
   const modalState = useMemo(() => state.modalState, [state.modalState]);
 
-  useEffect(() => {
-    if (!snippet) {
-      dispatch({ type: 'set_test_state', payload: 'initial' });
-    }
-  }, [snippet]);
+  // useEffect(() => {
+  //   if (!snippet) {
+  //     dispatch({ type: 'set_test_state', payload: 'initial' });
+  //   }
+  // }, [snippet]);
 
-  useEffect(() => {
-    dispatch({ type: 'replace', payload: tests });
-  }, [tests]);
+  // useEffect(() => {
+  //   dispatch({ type: 'replace', payload: testsFromState });
+  // }, [testsFromState]);
 
   const selectNext = useCallback(
     (isPrevious: boolean = false) => {
@@ -175,7 +189,11 @@ function AppLayout() {
             onCreateTest={() => {
               dispatch({
                 type: 'set_modal_state',
-                payload: { open: true, mode: 'create', editItem: undefined },
+                payload: {
+                  open: true,
+                  mode: 'create',
+                  editItem: { category: selectedCategory },
+                },
               });
             }}
           />
@@ -209,12 +227,13 @@ function AppLayout() {
       {/* Toggle sidebar action */}
       <button
         className={cx(
-          'text-white fixed left-2 top-3 bg-gray-950 p-2 rounded z-50',
+          'text-white fixed left-2 top-3 bg-gray-950 p-2 rounded',
           'transition-opacity duration-200',
           'hover:opacity-100',
           sidebarOpen ? 'opacity-100' : 'opacity-50'
         )}
         onClick={toggleSidebar}
+        style={{ zIndex: 9999999 }}
       >
         {IconSidebar}
       </button>
