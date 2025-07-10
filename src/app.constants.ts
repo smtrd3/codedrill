@@ -97,11 +97,11 @@ export const SAMPLE_TEMPLATES = [
 ];
 
 export const colors = [
-  ['blue', 'S'],
-  ['teal', 'A'],
-  ['purple', 'B'],
-  ['indigo', 'C'],
-  ['sky', 'D'],
-  ['lime', 'E'],
-  ['red', 'F'],
+  '#10b981',
+  '#3b82f6',
+  '#8b5cf6',
+  '#06b6d4',
+  '#ec4899',
+  '#f1c40f',
+  '#6b7280',
 ];

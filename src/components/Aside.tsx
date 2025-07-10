@@ -90,18 +90,17 @@ export function Aside(props: AsideProps) {
     <div
       id="side-bar"
       className={cx(
-        'fixed left-0 top-0 bottom-0 w-[360px] bg-slate-950 z-10 transition flex flex-col z-50',
+        'fixed left-0 top-0 bottom-0 w-[360px] bg-slate-950 transition flex flex-col',
         sidebarOpen
           ? 'opacity-100 pointer-events-auto translate-x-0'
           : 'opacity-0 pointer-events-none -translate-x-5'
       )}
       onClick={stopPropagation}
+      style={{ zIndex: 150 }}
     >
       {/* Header with Create new */}
-      <div className="flex justify-between items-center p-4 flex-shrink-0">
-        <h2 className="text-lg font-bold text-slate-200 font-sans pl-8">
-          Your Tests
-        </h2>
+      <div className="flex justify-between items-center flex-shrink-0 p-4">
+        <Categories category={selectedCategory} setCategory={setCategory} />
         <IconButton
           variant="ghost"
           onClick={createNew}
@@ -109,9 +108,6 @@ export function Aside(props: AsideProps) {
         >
           <Plus size={18} className="cursor-pointer" />
         </IconButton>
-      </div>
-      <div className="pl-4 mb-4">
-        <Categories category={selectedCategory} setCategory={setCategory} />
       </div>
       <div className="flex-grow overflow-x-hidden overflow-y-auto">
         {map(items, item => (

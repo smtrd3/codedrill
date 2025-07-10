@@ -115,15 +115,15 @@ function AppLayout() {
 
   const modalState = useMemo(() => state.modalState, [state.modalState]);
 
-  // useEffect(() => {
-  //   if (!snippet) {
-  //     dispatch({ type: 'set_test_state', payload: 'initial' });
-  //   }
-  // }, [snippet]);
+  useEffect(() => {
+    if (!snippet) {
+      dispatch({ type: 'set_test_state', payload: 'initial' });
+    }
+  }, [snippet]);
 
-  // useEffect(() => {
-  //   dispatch({ type: 'replace', payload: testsFromState });
-  // }, [testsFromState]);
+  useEffect(() => {
+    dispatch({ type: 'replace', payload: tests });
+  }, [tests]);
 
   const selectNext = useCallback(
     (isPrevious: boolean = false) => {
@@ -233,7 +233,7 @@ function AppLayout() {
           sidebarOpen ? 'opacity-100' : 'opacity-50'
         )}
         onClick={toggleSidebar}
-        style={{ zIndex: 9999999 }}
+        style={{ zIndex: 140 }}
       >
         {IconSidebar}
       </button>
